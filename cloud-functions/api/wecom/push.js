@@ -4,7 +4,7 @@ import { getSession } from '../../../lib/auth.js';
 
 // 兼容粘完整 Webhook URL、只粘 key、或带空格换行，统一成纯 key
 function normKey(raw) {
-  const s = String(raw || '').replace(/\s/g, '');
+  let s = String(raw || '').replace(/\s/g, '');
   if (!s) return '';
   const i = s.indexOf('key=');
   if (i >= 0) s = s.slice(i + 4);
