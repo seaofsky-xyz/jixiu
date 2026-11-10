@@ -7237,23 +7237,13 @@ function xBuildXlsx(t){
       onErr('browser');
     }
   }
-  /* 发送主逻辑：
-     没填 key → 用服务端内置机器人（免配置，任何设备打开即用）
-     填了 key → 用页面指定的机器人
-     中转不通 → 有 key 才尝试直连，否则失败并给 curl */
+  /* 发送主逻辑：统一走边缘函数中转（服务端发企微），
+     不在手机浏览器里直连企微（会跨域），所以只走 /api/wecom/push */
   function whPost(body, onOk, onFail){
     var key = normWhKey(whGet());
     var payload = '';
     try{ payload = JSON.stringify(body); }catch(e){ onFail('json'); return; }
-    var doDirect = function(){
-      if(!key){ onFail('nokey'); return; }
-      postJson(WH_HOST + key, payload, function(status, j){
-        if(j && j.errcode === 0) onOk();
-        else onFail(j && j.errmsg ? j.errmsg : ('http ' + status));
-      }, function(err){ onFail(err); });
-    };
-    if(whRelayOff()){ doDirect(); return; }
-    /* 免 key 模式：不带 key 字段，服务端自动用内置机器人 */
+    /* 填了 key 用页面指定的机器人；没填用服务端内置机器人 */
     var relayBody = key ? { key: key, msg: body } : { msg: body };
     postJson(RELAY_URL,
       JSON.stringify(relayBody),
@@ -7262,8 +7252,7 @@ function xBuildXlsx(t){
         else onFail((j && (j.error || (j.wecom && j.wecom.errmsg))) || ('relay http ' + status));
       },
       function(err){
-        if(key) doDirect();        /* 有自定义 key 才值得试直连 */
-        else onFail(err);          /* 免 key 模式直接报中转的真实错误 */
+        onFail(err);
       }
     );
   }
