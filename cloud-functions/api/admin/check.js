@@ -9,6 +9,8 @@ export default async function onRequest(context) {
   if (!want) return json({ error: '服务端未设置管理密码（环境变量 JIXIU_ADMIN_PW）' }, 400);
   if (got !== want) return json({ error: '管理密码不对' }, 401);
   const token = getToken(context.request);
-  if (token) await setRateOk(token, 1);
-  return json({ ok: true, rateOk: true });
+  const newToken = token ? setRateOk(token, 1) : null;
+  const headers = { 'Content-Type': 'application/json; charset=utf-8' };
+  if (newToken) headers['Set-Cookie'] = 'rs_token=' + newToken + '; Path=/; Max-Age=' + (CFG.sessionDays * 86400) + '; HttpOnly; SameSite=Lax';
+  return new Response(JSON.stringify({ ok: true, rateOk: true }), { status: 200, headers });
 }
