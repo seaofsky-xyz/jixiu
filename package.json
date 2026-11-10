@@ -9,6 +9,6 @@
     "dev": "JIXIU_LOCAL=1 node scripts/dev-server.js"
   },
   "dependencies": {
-    "@tencent/pages-blob": "latest"
+    "@edgeone/pages-blob": "^0.0.19"
   }
 }
