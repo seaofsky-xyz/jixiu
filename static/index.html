@@ -1368,22 +1368,33 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     if(el) el.textContent = t || '';
   }
 
-  /* ---------- 启动：先确认会话 ---------- */
-  fetch('/api/session', { credentials: 'same-origin' }).then(function(r){
-    return r.text().then(function(t){
-      var j = null; try { j = JSON.parse(t); } catch(e) { j = null; }
-      return { status: r.status, j: j };
+  /* ---------- 启动：先确认会话 ----------
+     EdgeOne Blob 会话写入后约 2 秒才可见，登录后 reload 立即查询会 401，
+     因此登录过（本地有登录记录）时对 401 做重试，避免被误踢回登录页。 */
+  function bootSession(attempt){
+    fetch('/api/session', { credentials: 'same-origin' }).then(function(r){
+      return r.text().then(function(t){
+        var j = null; try { j = JSON.parse(t); } catch(e) { j = null; }
+        return { status: r.status, j: j };
+      });
+    }).then(function(x){
+      if(x.status === 200 && x.j && x.j.emp){
+        seed(x.j);
+        gateResolve(true);
+      } else {
+        var logged = false;
+        try { logged = !!localStorage.getItem('wb_repair_login'); } catch(e){}
+        if(logged && attempt < 5){
+          setTimeout(function(){ bootSession(attempt + 1); }, 1200);
+        } else {
+          showLogin('');
+        }
+      }
+    }).catch(function(){
+      showLogin('连不上服务器，请检查网络');
     });
-  }).then(function(x){
-    if(x.status === 200 && x.j && x.j.emp){
-      seed(x.j);
-      gateResolve(true);
-    } else {
-      showLogin('');
-    }
-  }).catch(function(){
-    showLogin('连不上服务器，请检查网络');
-  });
+  }
+  bootSession(0);
 
   /* ---------- 数据库适配（业务代码调这 5 个方法） ---------- */
   function wrap(fn){
