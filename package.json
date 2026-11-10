@@ -1,0 +1,14 @@
+{
+  "name": "jixiu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "机修报修系统（EdgeOne Pages 全栈版）",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "JIXIU_LOCAL=1 node scripts/dev-server.js"
+  },
+  "dependencies": {
+    "@tencent/pages-blob": "latest"
+  }
+}

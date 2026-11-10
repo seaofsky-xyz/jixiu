@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "nodeVersion": "20.18.0",
+  "functions": {
+    "directory": "cloud-functions"
+  }
+}

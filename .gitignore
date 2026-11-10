@@ -7,6 +7,16 @@ data/*.db
 data/*.db-shm
 data/*.db-wal
 
+# 本地数据后端（迁移/联调产生的数据）
+data-store/
+
+# Node
+node_modules/
+package-lock.json
+
+# 构建产物
+dist/
+
 # 日志
 logs/*
 !logs/.gitkeep
