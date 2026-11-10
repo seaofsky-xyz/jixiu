@@ -1,0 +1,20 @@
+[Unit]
+Description=Repair Workbench (self-hosted)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/repair
+ExecStart=/usr/bin/python3 /opt/repair/server.py
+Restart=always
+RestartSec=3
+StandardOutput=append:/opt/repair/logs/server.log
+StandardError=append:/opt/repair/logs/server.err.log
+
+# 简单加固
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

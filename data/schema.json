@@ -1,0 +1,792 @@
+{
+  "bs5R43nhjgXcGROM4m0fpM": {
+    "name": "工单",
+    "properties": [
+      {
+        "id": "2ybbm7GL",
+        "name": "工单号",
+        "type": "text"
+      },
+      {
+        "id": "jgExM1oW",
+        "name": "部门",
+        "type": "text"
+      },
+      {
+        "id": "5Fsos2DS",
+        "name": "设备名称",
+        "type": "text"
+      },
+      {
+        "id": "TvogeDRk",
+        "name": "故障部位",
+        "type": "text"
+      },
+      {
+        "id": "EoVw1uV7",
+        "name": "故障描述",
+        "type": "text"
+      },
+      {
+        "id": "YqrJ9LP4",
+        "name": "优先级",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "a1b2c3d4e5f60718",
+              "text": "P1 紧急",
+              "style": 1
+            },
+            {
+              "id": "b2c3d4e5f6071829",
+              "text": "P2 一般",
+              "style": 8
+            },
+            {
+              "id": "c3d4e5f607182930",
+              "text": "P3 低",
+              "style": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "G3bOOmvG",
+        "name": "故障类别",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "d4e5f60718293041",
+              "text": "机械",
+              "style": 6
+            },
+            {
+              "id": "e5f6071829304152",
+              "text": "电气",
+              "style": 0
+            },
+            {
+              "id": "f607182930415263",
+              "text": "结构",
+              "style": 9
+            },
+            {
+              "id": "0718293041526374",
+              "text": "管道",
+              "style": 7
+            },
+            {
+              "id": "1829304152637485",
+              "text": "其他",
+              "style": 19
+            }
+          ]
+        }
+      },
+      {
+        "id": "aukRSDRX",
+        "name": "维修状态",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "2930415263748596",
+              "text": "待接单",
+              "style": 17
+            },
+            {
+              "id": "3041526374859617",
+              "text": "已派单",
+              "style": 2
+            },
+            {
+              "id": "4152637485961728",
+              "text": "维修中",
+              "style": 17
+            },
+            {
+              "id": "5263748596172839",
+              "text": "已完成",
+              "style": 23
+            },
+            {
+              "id": "6a7b8c9d0e1f2a3b",
+              "text": "挂起",
+              "style": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "SQKWGbYK",
+        "name": "报修人",
+        "type": "text"
+      },
+      {
+        "id": "XjtCdAVE",
+        "name": "维修人员",
+        "type": "text"
+      },
+      {
+        "id": "igEuiHKQ",
+        "name": "维修结果",
+        "type": "text"
+      },
+      {
+        "id": "vR5QtnCk",
+        "name": "报修日期",
+        "type": "date"
+      },
+      {
+        "id": "67bR8Ohc",
+        "name": "完成日期",
+        "type": "date"
+      },
+      {
+        "id": "8BOxMftd",
+        "name": "车间",
+        "type": "text"
+      },
+      {
+        "id": "S3W3Gbei",
+        "name": "完成人",
+        "type": "text"
+      },
+      {
+        "id": "QJXfZa5k",
+        "name": "转派人",
+        "type": "text"
+      },
+      {
+        "id": "8x7w6v5u",
+        "name": "外工",
+        "type": "text"
+      },
+      {
+        "id": "AIa1B2c3D4e5",
+        "name": "AI分析",
+        "type": "text"
+      },
+      {
+        "id": "Ratea1B2c3D4",
+        "name": "评分",
+        "type": "text"
+      },
+      {
+        "id": "Rateb2C3D4E5",
+        "name": "评分人",
+        "type": "text"
+      },
+      {
+        "id": "Ratec3D4E5F6",
+        "name": "评分日期",
+        "type": "text"
+      },
+      {
+        "id": "Rated4E5F6G7",
+        "name": "评分备注",
+        "type": "text"
+      }
+    ]
+  },
+  "kaUXkbQvcZRc46VPAA9Yzd": {
+    "name": "部门",
+    "properties": [
+      {
+        "id": "NBfJZPwF",
+        "name": "部门名称",
+        "type": "text"
+      },
+      {
+        "id": "gfHss50Q",
+        "name": "负责人",
+        "type": "text"
+      },
+      {
+        "id": "vsn6iZiD",
+        "name": "房间数",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 0,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "BhXsxjRR",
+        "name": "设备数",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 0,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "qNF6yIW7",
+        "name": "排序",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 0,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "NFDct3sS",
+        "name": "上级部门",
+        "type": "text"
+      }
+    ]
+  },
+  "uGev8GJMHP6m4NzMfXOA2E": {
+    "name": "配件",
+    "properties": [
+      {
+        "id": "xrKwwNHF",
+        "name": "编号",
+        "type": "text"
+      },
+      {
+        "id": "FuXgd4NE",
+        "name": "名称",
+        "type": "text"
+      },
+      {
+        "id": "aORHYu4r",
+        "name": "分类",
+        "type": "text"
+      },
+      {
+        "id": "wqT7zCbh",
+        "name": "用途",
+        "type": "text"
+      },
+      {
+        "id": "gUBll82h",
+        "name": "规格",
+        "type": "text"
+      },
+      {
+        "id": "7FCnmnq4",
+        "name": "单位",
+        "type": "text"
+      },
+      {
+        "id": "RVEmb8go",
+        "name": "当前库存",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 2,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "GiHGAROm",
+        "name": "最低库存",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 2,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "5RrQahPY",
+        "name": "适用设备",
+        "type": "text"
+      }
+    ]
+  },
+  "Q5R9iMj4TYVwHRuL6FNR4i": {
+    "name": "出入库",
+    "properties": [
+      {
+        "id": "1jiwqzzh",
+        "name": "流水号",
+        "type": "text"
+      },
+      {
+        "id": "EaR4TWZ2",
+        "name": "配件名称",
+        "type": "text"
+      },
+      {
+        "id": "UKFbbB41",
+        "name": "配件编号",
+        "type": "text"
+      },
+      {
+        "id": "OaHg4Uv7",
+        "name": "类型",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "a1f0e1d2c3b4a596",
+              "text": "领用出库",
+              "style": 9
+            },
+            {
+              "id": "b2e1d2c3b4a59607",
+              "text": "归还入库",
+              "style": 14
+            },
+            {
+              "id": "c3d2c3b4a5960718",
+              "text": "采购入库",
+              "style": 0
+            },
+            {
+              "id": "d4c3b4a596071829",
+              "text": "盘亏出库",
+              "style": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "2toNIGX0",
+        "name": "数量",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 2,
+          "useSeparate": false
+        }
+      },
+      {
+        "id": "D6qYJrTx",
+        "name": "单位",
+        "type": "text"
+      },
+      {
+        "id": "kK3Cpe8d",
+        "name": "关联工单号",
+        "type": "text"
+      },
+      {
+        "id": "ZRO2zk19",
+        "name": "领用人",
+        "type": "text"
+      },
+      {
+        "id": "I5Egs3W5",
+        "name": "部门",
+        "type": "text"
+      },
+      {
+        "id": "OiJ9gt7K",
+        "name": "备注",
+        "type": "text"
+      },
+      {
+        "id": "BwtSMwlB",
+        "name": "操作日期",
+        "type": "date"
+      },
+      {
+        "id": "f7wvNrMy",
+        "name": "库存变动后",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 2,
+          "useSeparate": false
+        }
+      }
+    ]
+  },
+  "3JlPfR1040CXW0DT39nyeW": {
+    "name": "排班管理",
+    "properties": [
+      {
+        "id": "3wS2L0tU",
+        "name": "工号",
+        "type": "text"
+      },
+      {
+        "id": "p9ufdfRk",
+        "name": "姓名",
+        "type": "text"
+      },
+      {
+        "id": "fCzZVwxF",
+        "name": "岗位",
+        "type": "text"
+      },
+      {
+        "id": "CaRwZRZs",
+        "name": "排班类型",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "a1b2c3d4e5f60718",
+              "text": "三班倒",
+              "style": 4
+            },
+            {
+              "id": "b2c3d4e5f6071829",
+              "text": "长白班",
+              "style": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "yEuwY6AB",
+        "name": "今日班次",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "c3d4e5f607182930",
+              "text": "早班",
+              "style": 4
+            },
+            {
+              "id": "d4e5f60718293041",
+              "text": "中班",
+              "style": 2
+            },
+            {
+              "id": "e5f6071829304152",
+              "text": "夜班",
+              "style": 21
+            },
+            {
+              "id": "f607182930415263",
+              "text": "行政/白班",
+              "style": 6
+            },
+            {
+              "id": "0718293041526374",
+              "text": "休息",
+              "style": 13
+            },
+            {
+              "id": "1829304152637485",
+              "text": "节假日",
+              "style": 23
+            }
+          ]
+        }
+      },
+      {
+        "id": "hXF4lA3D",
+        "name": "今日日期",
+        "type": "date"
+      },
+      {
+        "id": "dP6VWIQV",
+        "name": "今日岗位",
+        "type": "text"
+      },
+      {
+        "id": "bhcnOLOs",
+        "name": "联系电话",
+        "type": "text"
+      },
+      {
+        "id": "UAn0IFO8",
+        "name": "排序",
+        "type": "number",
+        "config": {
+          "decimalPlaces": 0,
+          "useSeparate": false
+        }
+      }
+    ]
+  },
+  "9Z7ER0L7K8iWA8uoBKoUVG": {
+    "name": "排班月历",
+    "properties": [
+      {
+        "id": "75GNOYUt",
+        "name": "日期",
+        "type": "date"
+      },
+      {
+        "id": "83smky7K",
+        "name": "工号",
+        "type": "text"
+      },
+      {
+        "id": "ylJWnXVz",
+        "name": "姓名",
+        "type": "text"
+      },
+      {
+        "id": "Yvi3YjaM",
+        "name": "岗位",
+        "type": "text"
+      },
+      {
+        "id": "PpLmUXwE",
+        "name": "班次",
+        "type": "select",
+        "config": {
+          "options": [
+            {
+              "id": "c3d4e5f607182930",
+              "text": "早班",
+              "style": 3
+            },
+            {
+              "id": "d4e5f60718293041",
+              "text": "中班",
+              "style": 10
+            },
+            {
+              "id": "e5f6071829304152",
+              "text": "夜班",
+              "style": 17
+            },
+            {
+              "id": "f607182930415263",
+              "text": "行政/白班",
+              "style": 15
+            },
+            {
+              "id": "0718293041526374",
+              "text": "休息",
+              "style": 2
+            },
+            {
+              "id": "1829304152637485",
+              "text": "节假日",
+              "style": 25
+            }
+          ]
+        }
+      },
+      {
+        "id": "6nixqnJM",
+        "name": "锁定",
+        "type": "checkbox"
+      }
+    ]
+  },
+  "KaL8XPicB0VMCF2zQbKnnN": {
+    "name": "排班规则",
+    "properties": [
+      {
+        "id": "WNHaSFQo",
+        "name": "名称",
+        "type": "text"
+      },
+      {
+        "id": "Td8hTlNt",
+        "name": "规则",
+        "type": "text"
+      },
+      {
+        "id": "SVWTCTeZ",
+        "name": "更新时间",
+        "type": "text"
+      }
+    ]
+  },
+  "XHyrYt3a95BCDqeF5vj4th": {
+    "name": "外工名单",
+    "properties": [
+      {
+        "id": "n1a2b3c4",
+        "name": "姓名",
+        "type": "text"
+      },
+      {
+        "id": "n5d6e7f8",
+        "name": "岗位",
+        "type": "text"
+      },
+      {
+        "id": "n9g0h1i2",
+        "name": "备注",
+        "type": "text"
+      }
+    ]
+  },
+  "lFyVS7Z61QnbweZU8RakJT": {
+    "name": "配件申购",
+    "properties": [
+      {
+        "id": "2146794e",
+        "name": "申购单号",
+        "type": "text"
+      },
+      {
+        "id": "60e4eda0",
+        "name": "申购日期",
+        "type": "text"
+      },
+      {
+        "id": "8299bd1c",
+        "name": "申请人",
+        "type": "text"
+      },
+      {
+        "id": "11cb055f",
+        "name": "申请部门",
+        "type": "text"
+      },
+      {
+        "id": "ff98e4ac",
+        "name": "配件编号",
+        "type": "text"
+      },
+      {
+        "id": "ab9bb1cf",
+        "name": "配件名称",
+        "type": "text"
+      },
+      {
+        "id": "088e0cc4",
+        "name": "规格",
+        "type": "text"
+      },
+      {
+        "id": "54b1be9f",
+        "name": "数量",
+        "type": "text"
+      },
+      {
+        "id": "62e7c141",
+        "name": "单位",
+        "type": "text"
+      },
+      {
+        "id": "bea7f74c",
+        "name": "用途",
+        "type": "text"
+      },
+      {
+        "id": "eac3edef",
+        "name": "关联工单号",
+        "type": "text"
+      },
+      {
+        "id": "d3075fbd",
+        "name": "期望到货",
+        "type": "text"
+      },
+      {
+        "id": "7e2c1a64",
+        "name": "状态",
+        "type": "text"
+      },
+      {
+        "id": "a3902020",
+        "name": "审批人",
+        "type": "text"
+      },
+      {
+        "id": "0283ccbb",
+        "name": "审批意见",
+        "type": "text"
+      },
+      {
+        "id": "5a1cd5bd",
+        "name": "入库日期",
+        "type": "text"
+      },
+      {
+        "id": "38cea314",
+        "name": "备注",
+        "type": "text"
+      },
+      {
+        "id": "088560c2",
+        "name": "图片数",
+        "type": "text"
+      },
+      {
+        "id": "8a81a3a9",
+        "name": "首图",
+        "type": "text"
+      }
+    ]
+  },
+  "TQmXsLMGDRcxB9f29zH08g": {
+    "name": "申购图片",
+    "properties": [
+      {
+        "id": "356f2be3",
+        "name": "申购单号",
+        "type": "text"
+      },
+      {
+        "id": "06b84455",
+        "name": "序号",
+        "type": "text"
+      },
+      {
+        "id": "b9293f90",
+        "name": "图片",
+        "type": "text"
+      },
+      {
+        "id": "51f07742",
+        "name": "上传人",
+        "type": "text"
+      },
+      {
+        "id": "d750b11f",
+        "name": "上传时间",
+        "type": "text"
+      }
+    ]
+  },
+  "z48uZ2AJgkeQBwoG8eVPa7": {
+    "name": "设备台账",
+    "properties": [
+      {
+        "id": "8e7bc3a9",
+        "name": "设备名称",
+        "type": "text"
+      },
+      {
+        "id": "0dbade76",
+        "name": "车间",
+        "type": "text"
+      },
+      {
+        "id": "a415e9b5",
+        "name": "常用故障部位",
+        "type": "text"
+      },
+      {
+        "id": "ccc7f2d6",
+        "name": "排序",
+        "type": "text"
+      },
+      {
+        "id": "0209f994",
+        "name": "状态",
+        "type": "text"
+      },
+      {
+        "id": "090d0614",
+        "name": "备注",
+        "type": "text"
+      }
+    ]
+  },
+  "RateAuthTable001": {
+    "name": "评分权限",
+    "properties": [
+      {
+        "id": "rAname001",
+        "name": "姓名",
+        "type": "text"
+      },
+      {
+        "id": "rAemp0002",
+        "name": "工号",
+        "type": "text"
+      },
+      {
+        "id": "rAnote0003",
+        "name": "备注",
+        "type": "text"
+      }
+    ]
+  }
+}

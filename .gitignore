@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# 数据库（真实工单数据，不上传）
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# 日志
+logs/*
+!logs/.gitkeep
+
+# 本地部署产物
+*.tar.gz

@@ -1,0 +1,15 @@
+{
+  "port": 8080,
+  "siteUrl": "",
+  "company": "",
+  "sessionDays": 30,
+  "tls": {
+    "cert": "",
+    "key": ""
+  },
+  "wecom": {
+    "webhookKey": ""
+  },
+  "extraUsers": [],
+  "adminEmps": []
+}
