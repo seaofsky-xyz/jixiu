@@ -7064,7 +7064,7 @@ function xBuildXlsx(t){
     } else { fallbackCopy(text, done); }
   }
   /* 当前页面地址（去掉 hash / 查询参数，拼上直达报修的参数） */
-  var SITE_URL = 'http://114.132.242.51:8080/';
+  var SITE_URL = 'https://jixiu.xn--rss758bvsg68d.xyz/';
   /* 群消息只发这条干净短链：点开直接进「维修单」页，接着按开工／挂起／完成即可。
      平台页面套在 iframe 里，外层链接的参数传不进 iframe，所以不靠参数定位，
      改为打开即落在维修单页；工单按报修时间倒序，最新那张就在最上面。 */
@@ -7337,8 +7337,8 @@ function xBuildXlsx(t){
     L.push('部门：' + (o.dept || '-') + (o.sub ? (' / ' + o.sub) : ''));
     L.push('设备：' + (o.device || '-') + (o.part ? (' · ' + o.part) : ''));
     L.push('故障：' + (o.fault || '-'));
-    if(o.pri) L.push('优先级：' + o.pri);
-    if(o.cat) L.push('类别：' + o.cat);
+    if(o.pri) L.push('优先级：' + optText('优先级', o.pri));
+    if(o.cat) L.push('类别：' + optText('故障类别', o.cat));
     L.push('报修人：' + (o.reporter || '-') + (o.date ? ('　' + o.date) : ''));
     if(o.pick) L.push('已派给：' + o.pick + (o.people > 1 ? ('（' + o.people + ' 人）') : ''));
     else L.push('状态：待接单（暂无人接）');
