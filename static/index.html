@@ -658,12 +658,13 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         <svg data-page-node-id="bCEeH8E34xyBTYN8btr8wV" fill="none" height="18" stroke="#12915c" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"><path data-page-node-id="x4A51CZe5bY8pKWd6t3lH8" d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-2.9-.5L4 21l1.6-4.7A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/><path data-page-node-id="pttYdz70u2oYrZGuQpaJK8" d="M8.5 10h7M8.5 13.5h4.5"/></svg><!--pnid:NSK5FBLDNMA2S7MfiIUBnt-->
         放到企业微信里用
       </div>
-      <div data-page-node-id="jJTcUd2F0akWQSTX5G06k2" class="wx-guide">
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px;line-height:1.5;color:var(--muted);margin:4px 0 10px"><span style="width:8px;height:8px;border-radius:50%;background:#12915c;flex:none"></span><span>已连接企业微信群机器人：报修、派单、挂起、维修完成都会自动推到群，无需配置</span></div>
+      <div data-page-node-id="jJTcUd2F0akWQSTX5G06k2" class="wx-guide" style="display:none">
         <div data-page-node-id="2SW03PlpKNNMadQbNjUjjw" class="wx-step"><b data-page-node-id="5UH3FaHj0T4Nr1Fvt6Vm8O"><!--pnid:PiDthEGzhjLkfUbeIAzZEz-->1</b><span data-page-node-id="ZEtM0RORiqjkGmGUlMq7Tt"><b data-page-node-id="29234xIWB7g4c1zMsV2PZk"><!--pnid:M8qZGNX7aJMPN3HYxKSep7-->机器人地址已经帮你配好了，默认不用填</b><!--pnid:fiJ4ByzXsckRk2RvidP23q-->，任何人在任何设备打开，提交报修、转派、挂起、维修完成都会自动推到群</span></div>
         <div data-page-node-id="idY1IVxja7FmIqgwSz0qXU" class="wx-step"><b data-page-node-id="4eT75wpkdgvpwnJKnDOpgd"><!--pnid:PKo4yxItHS9R0rYrPwxgGH-->2</b><span data-page-node-id="EU1fEH9gLxtP4EPsSKaLq1"><!--pnid:aIeUsBVOjVxLbQJng2Femi-->下面输入框留空即可；只有当你要换成另一个群机器人时，才粘新地址并点「保存」</span></div>
         <div data-page-node-id="R1bgbfFHEWjOLZpVLT4O8D" class="wx-step"><b data-page-node-id="RFH5vMLG2vCCweryE10xmO"><!--pnid:mKjTIweqT2ND3T3cDyMwux-->3</b><span data-page-node-id="uOCOgPUNujHtQVCaBAwyEE"><!--pnid:ttRfDEgatgGu8QOVsZZrBR-->点「发测试消息」验证；诊断框会逐条显示推送结果，提交报修后也会自动推</span></div>
       </div>
-      <div data-page-node-id="ii3eQQDQ72qfOWaCa8iPU4" class="wh-box">
+      <div data-page-node-id="ii3eQQDQ72qfOWaCa8iPU4" class="wh-box" style="display:none">
         <div data-page-node-id="p3aC0D4j6tYQEx7smNcDGa" class="wh-lbl"><!--pnid:rSuL9QMWFohEhjsltP9IxI-->机器人 Webhook 地址（可留空 · 默认已配好）</div>
         <textarea data-page-node-id="akAPoz8Y9Z0bZCnFtDyatq" class="wh-in" id="whInput" placeholder="留空 = 使用已配好的服务端机器人；要换群才粘贴新地址" rows="3"></textarea>
         <div data-page-node-id="OmDvCiRoc1wKNkVeegINEG" class="wh-row">
@@ -677,7 +678,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       </div>
       <div data-page-node-id="bu2mMDQY0wURJZRJ8gNJwT" class="wx-links">
         <button data-page-node-id="AkB2h7Bg05i8kqiA8g0jsL" class="btn" id="whPushBtn" style="min-height:40px"><!--pnid:IWGw2xvO365Gqfx4U5OD9W-->自动推群（报修/转派/完成/挂起）：已开启</button>
-        <button data-page-node-id="jeVzRCXLt4SxkVLFGFlLjS" class="btn btn-ghost" id="whRelayBtn" style="min-height:40px"><!--pnid:6Do7UwcfZpjOnZrWwsb6mR-->切换发送通道</button>
+        <button data-page-node-id="jeVzRCXLt4SxkVLFGFlLjS" class="btn btn-ghost" id="whRelayBtn" style="min-height:40px;display:none"><!--pnid:6Do7UwcfZpjOnZrWwsb6mR-->切换发送通道</button>
       </div>
       <div data-page-node-id="QoKhsMvGAZcjLTzHv426RY" class="wx-links" style="margin-top:8px">
         <button data-page-node-id="phDQVpq3ZvKG5SvVcd7biJ" class="btn" id="wxSendCard" style="min-height:40px"><!--pnid:zocwkp76UleDMNGFOi1zny-->发报修卡片到群</button>
@@ -688,7 +689,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         <button data-page-node-id="7aggagITUblmHxgoPUw43H" class="btn btn-ghost" id="wxCopyDaily" style="min-height:40px"><!--pnid:g2cdibq83ZPsw2e0hks7LG-->复制今日概况</button>
         <button data-page-node-id="FT6nm1rOrgrUYpmTTgriDN" class="btn btn-ghost" id="wxCopyUrl" style="min-height:40px"><!--pnid:6exmh3MuTcI2dhrkw5ZgnT-->复制报修链接</button>
       </div>
-      <div data-page-node-id="4ywvLlUDY8pEMFIazfdCiO" class="wx-note" id="wxNote"><!--pnid:L4j2BOwEBycnXoVT8E9YcM-->机器人地址放在服务端，不写进网页源码；网页直连企微会被浏览器拦（跨域），所以统一走中转服务。提交报修、转派、批量转派、挂起、恢复、维修完成都会往群里发消息；发送失败时会给出可执行的命令，粘到电脑终端跑一次即可补发。</div>
+      <div data-page-node-id="4ywvLlUDY8pEMFIazfdCiO" class="wx-note" id="wxNote"><!--pnid:L4j2BOwEBycnXoVT8E9YcM-->机器人已在服务端配好，网页不保存任何地址；报修、派单、挂起、维修完成自动推群，无需填写或配置。</div>
     </div>
 
     <div data-page-node-id="X6kAQWf6nm0cKVLgdLGVjM" class="card">
@@ -7948,7 +7949,6 @@ function xBuildXlsx(t){
       diag('已切换为：' + (off ? '直连企微（不推荐）' : '中转服务'));
       toast(off ? '已改为直连企微，浏览器会拦，需要配合命令发送' : '已改为中转服务，浏览器不会被拦');
     });
-    if($('whInput')) $('whInput').value = whUrl();
     renderWhStatus();
     renderPushSwitch();
     renderRelayStatus();
