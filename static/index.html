@@ -1781,7 +1781,14 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       out.push(r);
     }
     out.sort(function(a,b){
-      return (new Date(b['报修日期']||0).getTime()) - (new Date(a['报修日期']||0).getTime());
+      /* 主排序：报修日期倒序，新的一天排最上面 */
+      var d = (new Date(b['报修日期']||0).getTime()) - (new Date(a['报修日期']||0).getTime());
+      if(d) return d;
+      /* 次排序：报修日期只精确到天，同一天的单时间戳相同，
+         用工单号倒序区分先后（工单号 WX+日期+当日递增序号，号越大越晚报的），
+         保证新报的置顶、已报过的依次往下排 */
+      var na = String(a['工单号']||''), nb = String(b['工单号']||'');
+      return nb < na ? -1 : (nb > na ? 1 : 0);
     });
     return out;
   }
@@ -3137,26 +3144,32 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     if(!row) return;
     var reason = window.prompt('挂起原因（如：缺轴承，待采购；维修完成后其他挂起单可继续）', '缺配件');
     if(reason === null) return;
-    db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: {
+    var props = {
       '维修状态': { select: ST.hold },
       '维修结果': { text: appendResult(row, '【挂起】' + (reason.trim() || '待处理')) }
-    }}).then(function(){
+    };
+    db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: props }).then(function(){
       toast('已挂起，原因已记录');
+      applyPropsLocal(row, props);
+      renderAll();
+      setTimeout(function(){ loadAll(); }, 5000);
       pushOrderEvent(eventTextOf(row, '挂起待处理',
         '挂起原因：' + (reason.trim() || '待处理') + '\n状态：挂起（等配件或等支援）'), '挂起通知');
-      loadAll();
     }).catch(function(){ toast('挂起失败，请重试'); });
   }
   function doResume(id){
     var row = findOrder(id);
     if(!row) return;
-    db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: {
+    var props = {
       '维修状态': { select: ST.doing },
       '维修结果': { text: appendResult(row, '【恢复】继续维修') }
-    }}).then(function(){
+    };
+    db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: props }).then(function(){
       toast('已恢复，进入维修中');
+      applyPropsLocal(row, props);
+      renderAll();
+      setTimeout(function(){ loadAll(); }, 5000);
       pushOrderEvent(eventTextOf(row, '恢复维修', '状态：维修中（已重新开始处理）'), '恢复维修通知');
-      loadAll();
     }).catch(function(){ toast('恢复失败，请重试'); });
   }
   function doReassign(id){
@@ -7084,7 +7097,7 @@ function xBuildXlsx(t){
     } else { fallbackCopy(text, done); }
   }
   /* 当前页面地址（去掉 hash / 查询参数，拼上直达报修的参数） */
-  var SITE_URL = 'https://jixiu.海的天空.xyz/';
+  var SITE_URL = 'https://jixiu.xn--rss758bvsg68d.xyz/';
   /* 群消息只发这条干净短链：点开直接进「维修单」页，接着按开工／挂起／完成即可。
      平台页面套在 iframe 里，外层链接的参数传不进 iframe，所以不靠参数定位，
      改为打开即落在维修单页；工单按报修时间倒序，最新那张就在最上面。 */
