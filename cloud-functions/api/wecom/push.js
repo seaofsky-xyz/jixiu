@@ -35,7 +35,7 @@ export default async function onRequest(context) {
   if (!sess) return json({ error: 'not login' }, 401);
   const body = await readBody(context.request);
   let msg = body.msg || body;
-  if (body.image) {
+  if (body.image !== undefined && body.image !== null) {
     const im = toImageMsg(body.image);
     if (!im) return json({ ok: false, error: '图片数据为空或格式不对' }, 400);
     if (im.tooLarge) return json({ ok: false, error: '图片超过 2MB，企业微信不接受，请换一张或压缩后再发' }, 400);
