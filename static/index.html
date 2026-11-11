@@ -876,6 +876,28 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     </div>
   </div>
 </div>
+<div class="modal" id="holdModal">
+  <div class="modal-box">
+    <div class="modal-title">挂起 / 缺配件</div>
+    <div class="modal-sub" id="hdSub">修不好先挂起，可附现场照片一起发到群（照片选填，不附也能发）</div>
+    <div class="form-grid">
+      <div class="f-item full">
+        <label for="hdReason">挂起原因</label>
+        <input id="hdReason" type="text" placeholder="如：缺轴承 6205，待采购">
+      </div>
+      <div class="f-item full">
+        <label>现场照片（选填，最多 3 张）</label>
+        <div class="img-pick" id="hdImgs"></div>
+        <input accept="image/*" id="hdFile" multiple type="file" style="display:none">
+        <div class="img-tip">可拍损坏部位、缺的配件或铭牌；不加照片也能直接挂起发送</div>
+      </div>
+      <div class="f-item full" style="flex-direction:row; gap:8px">
+        <button class="btn" id="hdSubmit" style="flex:1">挂起并发送</button>
+        <button class="btn btn-ghost" id="hdCancel" style="flex:none; min-width:80px">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div data-page-node-id="QQPjVhtjmJQlkfJYTAg6xe" class="modal" id="personModal">
   <div data-page-node-id="m4WliyGF11ESSxbwYNu8CG" class="modal-box">
     <div data-page-node-id="RVpD4bT0MGGaDYXWojozgp" class="modal-title"><!--pnid:gU5i8DpR0zuKrmXuaWvSGD-->新增排班人员</div>
@@ -1484,6 +1506,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   var state = { page: 'orders', orders: [], depts: [], filter: 'all', keyword: '', mineOnly: false, selDept: '', selSub: '', openDept: '', submitting: false,
     parts: [], flows: [], partKeyword: '', partShown: 60, flowPart: null, flowType: 'out', partsLoading: false, faults: 1, selIds: {},
     buys: [], buysLoading: false, bqPart: null, bqImgs: [], ivList: [], ivAt: 0,
+    holdId: null, holdImgs: [],
     buyFilter: 'all', buyKw: '', buyShown: 20,
     shifts: [], shiftNow: null, curOrder: null, rolled: false,
     monthAll: [], monthYM: '', monthLocking: false, monthGen: false, monthGenTried: {}, selDays: {}, pwMode: '', pwTmp: '',
@@ -3139,24 +3162,109 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     if(old.indexOf('【' + head + '】') > -1) return old;   /* 幂等标记（如自动派单）不重复 */
     return old ? (old + '；' + tag) : tag;
   }
-  function doHold(id){
+  /* ----- 挂起：原因 + 选填现场照片（不附照片也能一键发送） ----- */
+  var HOLD_IMG_MAX = 3;
+  function renderHdImgs(){
+    var box = $('hdImgs'); if(!box) return;
+    var h = '';
+    for(var i=0;i<state.holdImgs.length;i++){
+      h += '<div class="img-thumb"><img src="' + state.holdImgs[i].data + '" alt="现场照片">'
+         + '<button type="button" class="ix" data-ix="' + i + '">×<~SL~button><~SL~div>';
+    }
+    if(state.holdImgs.length < HOLD_IMG_MAX){
+      h += '<button type="button" class="img-add" id="hdAdd">' + SVG_CAM + '<span>添加照片<~SL~span><~SL~button>';
+    }
+    box.innerHTML = toEscapeHtml(h);
+  }
+  function addHdImgs(files){
+    if(!files || !files.length) return;
+    var room = HOLD_IMG_MAX - state.holdImgs.length;
+    if(room <= 0){ toast('最多 3 张照片'); return; }
+    var picked = [], i;
+    for(i=0;i<files.length && picked.length<room;i++) picked.push(files[i]);
+    if(files.length > room) toast('最多 3 张，多的已忽略');
+    var idx = 0;
+    function next(){
+      if(idx >= picked.length){ renderHdImgs(); return; }
+      var f = picked[idx++];
+      shrinkImg(f, function(data){
+        if(!data){ toast('「' + (f.name || '图片') + '」读取失败'); next(); return; }
+        state.holdImgs.push({ name: f.name || 'photo.jpg', data: data });
+        next();
+      });
+    }
+    next();
+  }
+  function delHdImg(i){ state.holdImgs.splice(i, 1); renderHdImgs(); }
+  function openHold(id){
     var row = findOrder(id);
     if(!row) return;
-    var reason = window.prompt('挂起原因（如：缺轴承，待采购；维修完成后其他挂起单可继续）', '缺配件');
-    if(reason === null) return;
+    state.holdId = id;
+    state.holdImgs = [];
+    $('hdReason').value = '缺配件';
+    $('hdSub').textContent = '工单 ' + (row['工单号'] || '') + ' · ' + (row['设备名称'] || '')
+      + '；照片选填，不加也能直接挂起发送';
+    renderHdImgs();
+    rbOpen('hold', 'holdModal');
+    $('holdModal').className = 'modal show';
+  }
+  function closeHold(){ rbClose('hold'); }
+  /* 单张图片走同一条边缘函数中转，云端补算 md5（浏览器不支持 MD5） */
+  function whPostImage(data, onOk, onFail){
+    var key = normWhKey(whGet());
+    var relay = { image: data };
+    if(key) relay.key = key;
+    postJson(RELAY_URL, JSON.stringify(relay),
+      function(status, j){
+        if(j && j.ok) onOk();
+        else onFail((j && (j.error || (j.wecom && j.wecom.errmsg))) || ('relay http ' + status));
+      },
+      function(err){ onFail(err); });
+  }
+  function pushHoldImages(imgs){
+    if(!pushOn()){ diag('自动推群已关闭，' + imgs.length + ' 张现场照片未发送'); return; }
+    var i = 0, ok = 0, fail = 0;
+    toast('正在发送 ' + imgs.length + ' 张照片到群…');
+    function step(){
+      if(i >= imgs.length){
+        diag('现场照片：成功 ' + ok + ' 张' + (fail ? ('，失败 ' + fail + ' 张') : ''));
+        toast('照片已发群：成功 ' + ok + ' 张' + (fail ? ('，失败 ' + fail + ' 张') : ''));
+        return;
+      }
+      var it = imgs[i++];
+      whPostImage(it.data,
+        function(){ ok++; step(); },
+        function(e){ fail++; diag('照片发送失败：' + e); step(); });
+    }
+    step();
+  }
+  function submitHold(){
+    var id = state.holdId, row = findOrder(id);
+    if(!row){ closeHold(); return; }
+    var reason = ($('hdReason').value || '').trim() || '待处理';
+    var imgs = state.holdImgs.slice();
     var props = {
       '维修状态': { select: ST.hold },
-      '维修结果': { text: appendResult(row, '【挂起】' + (reason.trim() || '待处理')) }
+      '维修结果': { text: appendResult(row, '【挂起】' + reason) }
     };
+    var btn = $('hdSubmit'); btn.disabled = true; btn.textContent = '发送中…';
     db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: props }).then(function(){
       toast('已挂起，原因已记录');
       applyPropsLocal(row, props);
       renderAll();
       setTimeout(function(){ loadAll(); }, 5000);
-      pushOrderEvent(eventTextOf(row, '挂起待处理',
-        '挂起原因：' + (reason.trim() || '待处理') + '\n状态：挂起（等配件或等支援）'), '挂起通知');
-    }).catch(function(){ toast('挂起失败，请重试'); });
+      closeHold();
+      btn.disabled = false; btn.textContent = '挂起并发送';
+      var extra = '挂起原因：' + reason + '\n状态：挂起（等配件或等支援）'
+        + (imgs.length ? ('\n附现场照片 ' + imgs.length + ' 张，见群里随后图片') : '');
+      pushOrderEvent(eventTextOf(row, '挂起待处理', extra), '挂起通知');
+      if(imgs.length) pushHoldImages(imgs);
+    }).catch(function(){
+      btn.disabled = false; btn.textContent = '挂起并发送';
+      toast('挂起失败，请重试');
+    });
   }
+  function doHold(id){ openHold(id); }   /* 原入口保留，改为打开弹窗 */
   function doResume(id){
     var row = findOrder(id);
     if(!row) return;
@@ -7527,6 +7635,8 @@ function xBuildXlsx(t){
     }else if(kind === 'ext'){
       $('extModal').className = 'modal';
       extRevert();
+    }else if(kind === 'hold'){
+      $('holdModal').className = 'modal'; state.holdId = null; state.holdImgs = [];
     }else if(kind === 'fin'){
       $('finModal').className = 'modal';
     }else if(kind === 'ai'){
@@ -7925,6 +8035,15 @@ function xBuildXlsx(t){
     $('bqSubmit').addEventListener('click', submitBuy);
     $('bqCancel').addEventListener('click', closeBuy);
     $('buyModal').addEventListener('click', function(e){ if(e.target === this) closeBuy(); });
+    $('hdImgs').addEventListener('click', function(e){
+      var x = e.target.closest('[data-ix]');
+      if(x){ delHdImg(Number(x.getAttribute('data-ix'))); return; }
+      if(e.target.closest('#hdAdd')){ $('hdFile').click(); }
+    });
+    $('hdFile').addEventListener('change', function(){ addHdImgs(this.files); this.value = ''; });
+    $('hdSubmit').addEventListener('click', submitHold);
+    $('hdCancel').addEventListener('click', closeHold);
+    $('holdModal').addEventListener('click', function(e){ if(e.target === this) closeHold(); });
     $('fmSeg').addEventListener('click', function(e){
       var b = e.target.closest('button');
       if(!b) return;
