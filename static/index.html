@@ -192,6 +192,10 @@ body.dark .mode-btn.primary{border-color:#2b4a72}
 .img-add:active{background:var(--line)}
 .img-add svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
 .img-tip{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.hold-imgs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:7px}
+.hi-label{color:var(--muted);font-size:11px}
+.hi-thumb{width:50px;height:50px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:pointer;display:block;flex:none}
+.hi-thumb:active{opacity:.7}
 .modal.imgview{z-index:1300;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:14px}
 .modal.imgview .iv-box{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:12px}
 .modal.imgview .iv-img{max-width:100%;max-height:66vh;width:auto;height:auto;min-width:0;border-radius:12px;background:#111;display:block;object-fit:contain}
@@ -879,7 +883,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
 <div class="modal" id="holdModal">
   <div class="modal-box">
     <div class="modal-title">挂起 / 缺配件</div>
-    <div class="modal-sub" id="hdSub">修不好先挂起，可附现场照片一起发到群（照片选填，不附也能发）</div>
+    <div class="modal-sub" id="hdSub">修不好先挂起；现场照片只附在这张工单上，群里只发链接（照片选填）</div>
     <div class="form-grid">
       <div class="f-item full">
         <label for="hdReason">挂起原因</label>
@@ -889,7 +893,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         <label>现场照片（选填，最多 3 张）</label>
         <div class="img-pick" id="hdImgs"></div>
         <input accept="image/*" id="hdFile" multiple type="file" style="display:none">
-        <div class="img-tip">可拍损坏部位、缺的配件或铭牌；不加照片也能直接挂起发送</div>
+        <div class="img-tip">可拍损坏部位、缺的配件或铭牌；照片只存进这张工单，点开群链接进系统才看得到；不加照片也能直接挂起</div>
       </div>
       <div class="f-item full" style="flex-direction:row; gap:8px">
         <button class="btn" id="hdSubmit" style="flex:1">挂起并发送</button>
@@ -1816,6 +1820,17 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     return out;
   }
 
+  /* 挂起照片缩略图：只渲染在所属工单卡片里，点开看大图 */
+  function holdImgsHtml(r){
+    var list = parseHoldImgs(r['挂起照片']);
+    if(!list.length) return '';
+    var h = '<div class="order-sub hold-imgs"><span class="hi-label">现场照片 '+list.length+' 张（点开看大图）：</span>';
+    for(var j=0;j<list.length;j++){
+      h += '<img class="hi-thumb" src="'+escapeHtml(list[j])+'" data-act="holdimg" data-ix="'+j+'" alt="现场照片'+(j+1)+'">';
+    }
+    return h + '<~SL~div>';
+  }
+
   function renderList(){
     var box = $('orderList');
     var rows = filteredOrders();
@@ -1862,6 +1877,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         + (r['完成人'] ? '<div class="order-sub">完成人：'+escapeHtml(r['完成人'])+'<~SL~div>' : '')
         + ((stKey(r['维修状态']) === 'done' && canRate()) ? rateLineHtml(r) : '')
         + (r['维修结果'] ? '<div class="order-sub" data-display="result">结果：'+escapeHtml(r['维修结果'])+(r['完成日期']?'（'+fmtDate(r['完成日期'])+' 完成）':'')+'<~SL~div>' : '')
+        + holdImgsHtml(r)
         + '<div class="order-actions">'+actions
         + '<button class="btn btn-ghost" data-act="parts">领用配件'+(usedCount(r['工单号'])?' ('+usedCount(r['工单号'])+')':'')+'<~SL~button>'
         + '<button class="btn-del" data-act="del">删除<~SL~button><~SL~div>'
@@ -3203,40 +3219,23 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     state.holdImgs = [];
     $('hdReason').value = '缺配件';
     $('hdSub').textContent = '工单 ' + (row['工单号'] || '') + ' · ' + (row['设备名称'] || '')
-      + '；照片选填，不加也能直接挂起发送';
+      + '；照片选填，只附在本工单上，群里只发链接';
     renderHdImgs();
     rbOpen('hold', 'holdModal');
     $('holdModal').className = 'modal show';
   }
   function closeHold(){ rbClose('hold'); }
-  /* 单张图片走同一条边缘函数中转，云端补算 md5（浏览器不支持 MD5） */
-  function whPostImage(data, onOk, onFail){
-    var key = normWhKey(whGet());
-    var relay = { image: data };
-    if(key) relay.key = key;
-    postJson(RELAY_URL, JSON.stringify(relay),
-      function(status, j){
-        if(j && j.ok) onOk();
-        else onFail((j && (j.error || (j.wecom && j.wecom.errmsg))) || ('relay http ' + status));
-      },
-      function(err){ onFail(err); });
-  }
-  function pushHoldImages(imgs){
-    if(!pushOn()){ diag('自动推群已关闭，' + imgs.length + ' 张现场照片未发送'); return; }
-    var i = 0, ok = 0, fail = 0;
-    toast('正在发送 ' + imgs.length + ' 张照片到群…');
-    function step(){
-      if(i >= imgs.length){
-        diag('现场照片：成功 ' + ok + ' 张' + (fail ? ('，失败 ' + fail + ' 张') : ''));
-        toast('照片已发群：成功 ' + ok + ' 张' + (fail ? ('，失败 ' + fail + ' 张') : ''));
-        return;
-      }
-      var it = imgs[i++];
-      whPostImage(it.data,
-        function(){ ok++; step(); },
-        function(e){ fail++; diag('照片发送失败：' + e); step(); });
+  /* 挂起照片存在工单记录的「挂起照片」字段里（JSON 数组，元素是压缩后的 dataURL）。
+     群里只发带链接的文字通知，点开链接进系统、在这张工单上才看得到照片；
+     照片不单独发群、不进申购、不出现在其他任何地方。 */
+  function parseHoldImgs(v){
+    if(!v) return [];
+    var a = v;
+    if(typeof v === 'string'){
+      try{ a = JSON.parse(v); }catch(e){ return []; }
     }
-    step();
+    if(!Array.isArray(a)) return [];
+    return a.filter(function(x){ return typeof x === 'string' && x.indexOf('data:image') === 0; });
   }
   function submitHold(){
     var id = state.holdId, row = findOrder(id);
@@ -3245,20 +3244,20 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     var imgs = state.holdImgs.slice();
     var props = {
       '维修状态': { select: ST.hold },
-      '维修结果': { text: appendResult(row, '【挂起】' + reason) }
+      '维修结果': { text: appendResult(row, '【挂起】' + reason) },
+      '挂起照片': { text: imgs.length ? JSON.stringify(imgs.map(function(it){ return it.data; })) : '' }
     };
     var btn = $('hdSubmit'); btn.disabled = true; btn.textContent = '发送中…';
     db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: props }).then(function(){
-      toast('已挂起，原因已记录');
+      toast(imgs.length ? ('已挂起，' + imgs.length + ' 张照片已附到本工单') : '已挂起，原因已记录');
       applyPropsLocal(row, props);
       renderAll();
       setTimeout(function(){ loadAll(); }, 5000);
       closeHold();
       btn.disabled = false; btn.textContent = '挂起并发送';
       var extra = '挂起原因：' + reason + '\n状态：挂起（等配件或等支援）'
-        + (imgs.length ? ('\n附现场照片 ' + imgs.length + ' 张，见群里随后图片') : '');
+        + (imgs.length ? ('\n现场照片 ' + imgs.length + ' 张已附在这张工单上，点开下方链接进系统、在挂起工单里查看') : '');
       pushOrderEvent(eventTextOf(row, '挂起待处理', extra), '挂起通知');
-      if(imgs.length) pushHoldImages(imgs);
     }).catch(function(){
       btn.disabled = false; btn.textContent = '挂起并发送';
       toast('挂起失败，请重试');
@@ -7542,7 +7541,8 @@ function xBuildXlsx(t){
       if(row['转派人']) L.push('上次转派人：' + String(row['转派人']));
     }
     if(extra) L.push(extra);
-    L.push('点开直接接单（维修好／挂起）：' + SITE_URL);
+    L.push((String(kind).indexOf('挂起') >= 0
+      ? '点开查看这张挂起工单和现场照片：' : '点开直接接单（维修好／挂起）：') + SITE_URL);
     return L.join('\n');
   }
   /* 批量操作汇总成一条，避免刷屏（机器人限 20 条/分钟） */
@@ -7907,6 +7907,13 @@ function xBuildXlsx(t){
       else if(act === 'parts'){ var od = findOrder(id); pickPartsForOrder(od ? od['工单号'] : ''); }
       else if(act === 'ai') openAiAnalysis(id, false);
       else if(act === 'rate') openRate(id);
+      else if(act === 'holdimg'){
+        var hr = findOrder(id);
+        if(hr){
+          var hl = parseHoldImgs(hr['挂起照片']);
+          if(hl.length) openImgView(hl, Number(btn.getAttribute('data-ix')) || 0);
+        }
+      }
       else if(act === 'del') doDelete(id);
     });
     $('deptManageList').addEventListener('click', function(e){
