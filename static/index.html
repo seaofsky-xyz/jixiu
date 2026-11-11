@@ -1781,8 +1781,6 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       out.push(r);
     }
     out.sort(function(a,b){
-      var ao = isOverdue(a)?1:0, bo = isOverdue(b)?1:0;
-      if(ao!==bo) return bo-ao;
       return (new Date(b['报修日期']||0).getTime()) - (new Date(a['报修日期']||0).getTime());
     });
     return out;
@@ -2938,6 +2936,23 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     for(var i=0;i<state.orders.length;i++){ if(state.orders[i]._id === id) return state.orders[i]; }
     return null;
   }
+  /* 把写库的 properties（{text}/{select}/{date}…）立即应用到本地工单，实现乐观更新，
+     避免云存储 5~6 秒写入延迟导致完工后状态回跳 */
+  function applyPropsLocal(row, props){
+    if(!row || !props) return;
+    for(var k in props){
+      var v = props[k];
+      if(v && typeof v === 'object'){
+        if('text' in v) row[k] = v.text;
+        else if('select' in v) row[k] = v.select;
+        else if('number' in v) row[k] = v.number;
+        else if('date' in v) row[k] = v.date;
+        else if('checkbox' in v) row[k] = v.checkbox;
+      } else {
+        row[k] = v;
+      }
+    }
+  }
   function usedCount(orderNo){
     if(!orderNo) return 0;
     var n = 0;
@@ -2998,7 +3013,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       var props = makeProps(row, ids[i]);
       if(!props){ return step(i + 1); }
       return db.updateRecord({ databaseId: DB_ORDER, recordId: ids[i], properties: props })
-        .then(function(){ ok++; })
+        .then(function(){ ok++; applyPropsLocal(row, props); })
         .catch(function(err){ console.error('[bulk] 失败', ids[i], err); fail++; })
         .then(function(){ return step(i + 1); });
     }
@@ -3007,7 +3022,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       toast(label + '：成功 ' + ok + ' 单' + (fail ? ('，失败 ' + fail + ' 单') : ''));
       state.selIds = {};
       refreshBulk();
-      loadAll();
+      renderAll();
+      setTimeout(function(){ loadAll(); }, 5000);
       if(done) done();
     });
   }
@@ -3779,10 +3795,14 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       db.updateRecord({ databaseId: DB_ORDER, recordId: id, properties: props })
         .then(function(){
           toast('工单已完成' + (who ? '，完成人 ' + who : ''));
+          /* 乐观更新：立即把本地该单改成已完成并重绘，不等云存储延迟 */
+          applyPropsLocal(findOrder(id), props);
+          renderAll();
+          /* 延迟后台同步真实数据（等云存储写入传播） */
+          setTimeout(function(){ loadAll(); }, 5000);
           /* 多问题报修里「修好一项」也要让群里看见，没修好的那几项另外转派/挂起 */
           pushOrderEvent(eventTextOf(row, '维修完成',
             '维修结果：' + (result || '已完成') + '\n完成人：' + (who || '—') + '\n状态：已完成'), '维修完成通知');
-          loadAll();
           /* 完成后自动弹 AI 诊断分析，关掉后引导评分 */
           setTimeout(function(){ openAiAnalysis(id, false, true); }, 600);
         })
@@ -7064,7 +7084,7 @@ function xBuildXlsx(t){
     } else { fallbackCopy(text, done); }
   }
   /* 当前页面地址（去掉 hash / 查询参数，拼上直达报修的参数） */
-  var SITE_URL = 'https://jixiu.xn--rss758bvsg68d.xyz/';
+  var SITE_URL = 'https://jixiu.海的天空.xyz/';
   /* 群消息只发这条干净短链：点开直接进「维修单」页，接着按开工／挂起／完成即可。
      平台页面套在 iframe 里，外层链接的参数传不进 iframe，所以不靠参数定位，
      改为打开即落在维修单页；工单按报修时间倒序，最新那张就在最上面。 */
