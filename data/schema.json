@@ -188,6 +188,26 @@
         "id": "Rated4E5F6G7",
         "name": "评分备注",
         "type": "text"
+      },
+      {
+        "id": "ownEmp0001",
+        "name": "报修人工号",
+        "type": "text"
+      },
+      {
+        "id": "cxlStat001",
+        "name": "撤销状态",
+        "type": "text"
+      },
+      {
+        "id": "cxlBy00002",
+        "name": "撤销人",
+        "type": "text"
+      },
+      {
+        "id": "cxlAt00003",
+        "name": "撤销时间",
+        "type": "text"
       }
     ]
   },
@@ -789,6 +809,26 @@
       },
       {
         "id": "rAnote0003",
+        "name": "备注",
+        "type": "text"
+      }
+    ]
+  },
+  "CancelAuthTable001": {
+    "name": "撤销权限",
+    "properties": [
+      {
+        "id": "cAname001",
+        "name": "姓名",
+        "type": "text"
+      },
+      {
+        "id": "cAemp0002",
+        "name": "工号",
+        "type": "text"
+      },
+      {
+        "id": "cAnote0003",
         "name": "备注",
         "type": "text"
       }

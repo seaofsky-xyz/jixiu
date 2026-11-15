@@ -63,6 +63,12 @@ button{font-family:inherit;cursor:pointer;border:none;min-height:44px}
 .btn-ai{background:var(--blue-bg);color:var(--primary);box-shadow:inset 0 0 0 1px rgba(26,111,235,.28)}
 .btn-done{background:var(--green-bg);color:var(--green)}
 .btn-del{background:transparent;color:var(--muted);font-size:12px;min-height:32px;padding:0 8px}
+.btn-cancel{background:transparent;color:#dc2626;font-size:12px;min-height:32px;padding:0 8px}
+.cx-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.cx-row:last-child{border-bottom:none}
+.cx-row .cx-main{flex:1;min-width:0}
+.cx-row .cx-t{font-size:13px;font-weight:600;word-break:break-all}
+.cx-row .cx-s{font-size:11px;color:var(--muted);margin-top:2px;word-break:break-all}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .f-item{display:flex;flex-direction:column;gap:5px}
 .f-item.full{grid-column:1/-1}
@@ -367,6 +373,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
 .pm-row .sm-n{font-size:14px;font-weight:600}
 .pm-row .sm-r{font-size:11px;color:var(--muted)}
 .pm-del{flex:none;min-height:32px;padding:0 12px;font-size:12px;color:#dc2626;border-color:#fecaca;white-space:nowrap;min-width:56px}
+.btn.pm-del{background:transparent;border:1px solid #fecaca}
 .pm-acts{display:flex;gap:8px}
 .pm-acts .btn{flex:1;min-height:40px}
 .pm-btn-row{display:flex;gap:8px;margin:8px 0 2px;flex-wrap:wrap}
@@ -842,6 +849,10 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         <div class="set-main"><div class="set-name">评分设置</div><div class="set-meta" id="rateAuthText">-</div></div>
         <button class="btn btn-ghost" id="rateAuthBtn" style="min-height:38px">管理</button>
       </div>
+      <div class="set-row" id="cancelAuthRow">
+        <div class="set-main"><div class="set-name">撤销与权限</div><div class="set-meta" id="cancelAuthText">-</div></div>
+        <button class="btn btn-ghost" id="cancelAuthBtn" style="min-height:38px">管理</button>
+      </div>
       <div data-page-node-id="nMDl5IDqa5Ye2jArmetj0l" class="set-row">
         <div data-page-node-id="aM1vjzvh6UdTMCNOQblzln" class="set-main"><div data-page-node-id="kZluUxiDJ4LJDs6mTftuCR" class="set-name"><!--pnid:Jz5tsJul5GlU29gkH0OMuD-->当前登录</div><div data-page-node-id="40M1mOhfwIQsS77qmZPJoE" class="set-meta" id="loginWho"><!--pnid:yEvjkiIpLzPOz9ePAI1I1u-->未登录</div></div>
         <button data-page-node-id="Gx5tEwjkXEEBDaMMMe69nH" class="btn btn-ghost" id="pwLogoutBtn" style="min-height:38px"><!--pnid:ZryED941dicpCfedi2jEq7-->退出</button>
@@ -1139,6 +1150,43 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     </div>
   </div>
 </div>
+<div class="modal" id="cancelAuthModal">
+  <div class="modal-box">
+    <div class="modal-title">撤销与权限</div>
+    <div class="modal-sub" id="cancelWho">-</div>
+
+    <div id="cancelPwView">
+      <div class="modal-sub">报修人本人可以撤自己的单；管理员（管理密码）和下面名单里的人可以撤任意单。管理名单需要输入管理密码。</div>
+      <div class="form-grid">
+        <div class="f-item full" style="flex-direction:row; gap:8px">
+          <input id="cancelPw" placeholder="管理密码" type="password" style="flex:1">
+          <button class="btn" id="cancelPwOk" type="button" style="flex:none; min-width:76px">验证</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cancelMgrView" style="display:none">
+      <div class="modal-sub">名单里的人（按姓名或工号）可以撤销 / 恢复任何报修单。名单存服务端、全员共享，只有管理员能改。</div>
+      <div class="rate-list" id="cancelAuthList"></div>
+      <div class="form-grid">
+        <div class="f-item full" style="flex-direction:row; gap:8px">
+          <input id="cancelAuthName" placeholder="姓名" type="text" style="width:96px; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:15px; background:var(--input); color:var(--text)">
+          <input id="cancelAuthEmp" placeholder="工号(选填)" type="text" style="width:96px; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font-size:15px; background:var(--input); color:var(--text)">
+          <button class="btn btn-ghost" id="cancelAuthAddBtn" type="button" style="flex:none; min-width:64px">添加</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-sub" style="margin-top:12px; font-weight:600">已撤销的报修单（可恢复）</div>
+    <div class="rate-list" id="canceledList"></div>
+
+    <div class="form-grid">
+      <div class="f-item full" style="flex-direction:row; gap:8px">
+        <button class="btn btn-ghost" id="cancelAuthClose" type="button" style="flex:1">完成</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div data-page-node-id="OxoU8Ie5vtwdoD2pHLCzwL" class="modal" id="devModal">
   <div data-page-node-id="PFQ97eBm4uWqNin7utKmQi" class="modal-box dev-box">
     <div data-page-node-id="2rQkiKUzOnUkg21uSd9QI8" class="modal-title" id="devModalTitle"><!--pnid:aAEjy130DXcDEPZI8KnSLC-->选择设备</div>
@@ -1299,7 +1347,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   function seed(u){
     try{
       /* state 在另一个脚本块里，通过全局桥接把「本机评分权限」传过去 */
-      if(window.RS_setRateOk) window.RS_setRateOk(!!u.rateOk);
+      if(window.RS_setSession) window.RS_setSession(u);
+      else if(window.RS_setRateOk) window.RS_setRateOk(!!u.rateOk);
       localStorage.setItem('wb_repair_login', JSON.stringify({
         emp: u.emp, name: u.name || '', job: u.job || '', t: new Date().getTime()
       }));
@@ -1487,6 +1536,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   var DB_DEV = 'z48uZ2AJgkeQBwoG8eVPa7';   /* 设备台账：报修时直接选，不用手打 */
   var DB_EXT = 'XHyrYt3a95BCDqeF5vj4th';   /* 外工名单：本厂其他岗位同事，报修时可多选协同 */
   var DB_RAUTH = 'RateAuthTable001';       /* 评分权限：名单存服务端，全员共享，只有管理员能改 */
+  var DB_CANCEL_AUTH = 'CancelAuthTable001'; /* 撤销权限：可撤销/恢复报修单的人 */
   /* 法定节假日：[起, 止, 全名, 表头简称]
      2026 年 = 国务院办公厅《关于2026年部分节假日安排的通知》正式安排；
      2027 年官方通知尚未发布，按修订后的《全国年节及纪念日放假办法》推算，页面里可自行增删。 */
@@ -1528,11 +1578,22 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     shifts: [], shiftNow: null, curOrder: null, rolled: false,
     monthAll: [], monthYM: '', monthLocking: false, monthGen: false, monthGenTried: {}, selDays: {}, pwMode: '', pwTmp: '',
     rule: null, ruleId: '', ruleLoaded: false, hol: {}, holYear: '', regenBusy: false,
-    faPicks: {}, faManual: false, faSnap: null, exts: [], extPicks: {}, extSnap: null, rateAuth: [], rateOk: false };
+    faPicks: {}, faManual: false, faSnap: null, exts: [], extPicks: {}, extSnap: null,
+    rateAuth: [], rateOk: false,
+    cancelAuth: [], adminOk: false, cancelOk: false, myEmp: '', myLoginName: '' };
   /* 第一段脚本（会话/登录）用它把「本机是否已授权评分」回传进来 */
   window.RS_setRateOk = function(v){
     state.rateOk = !!v;
     try{ renderRateAuthMeta(); renderList(); renderMyStat(); }catch(e){}
+  };
+  /* 第一段脚本（会话/登录）把登录身份与撤销权限回传进来，避免页面自己去猜 */
+  window.RS_setSession = function(u){
+    state.rateOk = !!u.rateOk;
+    state.adminOk = !!u.adminOk;
+    state.cancelOk = !!u.cancelOk;
+    state.myEmp = String(u.emp || '').trim();
+    state.myLoginName = String(u.name || '').trim();
+    try{ renderRateAuthMeta(); renderCancelMeta(); renderList(); renderMyStat(); }catch(e){}
   };
   var OPTS = {};   /* fieldName -> [{text,id}] */
   var me = { company: '我的工厂', myName: '' };
@@ -1809,10 +1870,36 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     }
   }
 
+  /* ---------- 报修单撤销权限 ----------
+     前端只负责「显示 / 隐藏撤销按钮」，真正的判定在 /api/order/cancel 里再做一次。
+     报修人本人靠工单上的「报修人工号」（提交报修时自动写入）精确匹配登录工号。 */
+  function loginEmp(){
+    try{ return String((JSON.parse(localStorage.getItem('wb_repair_login') || '{}') || {}).emp || '').trim(); }catch(e){ return ''; }
+  }
+  function loginName(){
+    try{ return String((JSON.parse(localStorage.getItem('wb_repair_login') || '{}') || {}).name || '').trim(); }catch(e){ return ''; }
+  }
+  function isMineOrder(r){
+    if(!r) return false;
+    var ep = state.myEmp || loginEmp(), nm = state.myLoginName || loginName();
+    if(ep && String(r['报修人工号'] || '').trim() === ep) return true;
+    if(nm && String(r['报修人'] || '').trim() === nm) return true;
+    return false;
+  }
+  function isCanceled(r){ return String((r && r['撤销状态']) || '') === '已撤销'; }
+  function canCancel(r){ return !!(state.cancelOk || state.adminOk || isMineOrder(r)); }
+  function refreshSession(){
+    fetch('/api/session', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(u){ if(u && u.emp && window.RS_setSession) window.RS_setSession(u); })
+      .catch(function(){});
+  }
+
   function filteredOrders(){
     var kw = state.keyword, out = [];
     for(var i=0;i<state.orders.length;i++){
       var r = state.orders[i];
+      if(isCanceled(r)) continue;   /* 已撤销的单从维修单列表移走，在「我的 → 撤销与权限」里可恢复 */
       if(state.filter !== 'all' && stKey(r['维修状态']) !== state.filter) continue;
       if(state.mineOnly && me.myName && (r['报修人']||'').indexOf(me.myName) === -1 && (r['转派人']||'').indexOf(me.myName) === -1 && (r['维修人员']||'').indexOf(me.myName) === -1 && (r['完成人']||'').indexOf(me.myName) === -1) continue;
       if(kw){
@@ -1868,6 +1955,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       }
       /* 任何状态的报修单都能点开 AI 诊断：刚报的新单也要能先看原因推断和排查建议 */
       actions = '<button class="btn btn-ai" data-act="ai">AI 诊断<~SL~button>' + actions;
+      /* 撤销只对有权限的人显示：报修人本人 / 管理员 / 你添加的授权人 */
+      if(canCancel(r)) actions += '<button class="btn btn-cancel" data-act="cancel">撤销<~SL~button>';
       var picked = !!state.selIds[r._id];
       html += '<div class="order'+(od?' overdue':'')+'" data-rec="'+escapeHtml(r._id)+'">'
         + '<div class="order-head">'
@@ -1894,8 +1983,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         + (r['维修结果'] ? '<div class="order-sub" data-display="result">结果：'+escapeHtml(r['维修结果'])+(r['完成日期']?'（'+fmtDate(r['完成日期'])+' 完成）':'')+'<~SL~div>' : '')
         + holdImgsHtml(r)
         + '<div class="order-actions">'+actions
-        + '<button class="btn btn-ghost" data-act="parts">领用配件'+(usedCount(r['工单号'])?' ('+usedCount(r['工单号'])+')':'')+'<~SL~button>'
-        + '<button class="btn-del" data-act="del">删除<~SL~button><~SL~div>'
+        + '<button class="btn btn-ghost" data-act="parts">领用配件'+(usedCount(r['工单号'])?' ('+usedCount(r['工单号'])+')':'')+'<~SL~button><~SL~div>'
         + '<~SL~div>';
     }
     box.innerHTML = toEscapeHtml(html);
@@ -1908,6 +1996,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     var reported = 0, doneByMe = 0, rateSum = 0, rateCnt = 0;
     for(var i=0;i<state.orders.length;i++){
       var r = state.orders[i];
+      if(isCanceled(r)) continue;
       if(me.myName && (r['报修人']||'').indexOf(me.myName) !== -1) reported++;
       if(me.myName && ((r['维修人员']||'').indexOf(me.myName) !== -1 || (r['完成人']||'').indexOf(me.myName) !== -1)) doneByMe++;
       if(me.myName && canRate()){
@@ -2901,6 +2990,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         '维修状态': { select: ST.wait },
         '报修人': { text: rep }
       };
+      var _emp0 = state.myEmp || loginEmp();
+      if(_emp0) props['报修人工号'] = { text: _emp0 };   /* 让报修人本人以后能自己撤单 */
       if(sub) props['车间'] = { text: sub };
       if(it.part) props['故障部位'] = { text: it.part };
       var pid = optId('优先级', it.pri);
@@ -3049,6 +3140,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         '维修状态': { select: ST.wait },
         '报修人': { text: reporter }
       };
+      var _emp1 = state.myEmp || loginEmp();
+      if(_emp1) props['报修人工号'] = { text: _emp1 };   /* 让报修人本人以后能自己撤单 */
       if(sub) props['车间'] = { text: sub };
       var extNames = extPickedNames();
       if(extNames.length) props['外工'] = { text: extNames.join('、') };
@@ -4133,11 +4226,32 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         .catch(function(){ toast('更新失败，请重试'); });
     });
   }
-  function doDelete(id){
-    if(!window.confirm('确定删除这条工单吗？删除后不可恢复。')) return;
-    db.deleteRecord({ databaseId: DB_ORDER, recordId: id })
-      .then(function(){ toast('已删除'); loadAll(); })
-      .catch(function(){ toast('删除失败，请重试'); });
+  /* 撤销 / 恢复报修单：走专用接口，服务端按权限判定；撤销是软撤销，记录保留、可恢复 */
+  function doCancel(id, restore){
+    var row = findOrder(id);
+    if(!canCancel(row)){ toast('没有权限撤销这条报修单'); return; }
+    if(!restore && !window.confirm('确定撤销这条报修单吗？\n撤销后会从维修单列表移走，可在「我的 → 撤销与权限」里恢复。')) return;
+    fetch('/api/order/cancel', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId: id, mode: restore ? 'restore' : 'cancel' })
+    }).then(function(r){
+      return r.text().then(function(t){
+        var j = null; try{ j = JSON.parse(t); }catch(e){ j = null; }
+        if(!r.ok) throw new Error((j && j.error) || ('服务返回 ' + r.status));
+        return j || {};
+      });
+    }).then(function(j){
+      if(!j.ok) throw new Error(j.error || '操作失败');
+      var props = restore
+        ? { '撤销状态': { text: '' }, '撤销人': { text: '' }, '撤销时间': { text: '' } }
+        : { '撤销状态': { text: '已撤销' }, '撤销人': { text: j.by || '' }, '撤销时间': { text: j.at || '' } };
+      applyPropsLocal(row, props);
+      renderAll(); renderCanceledList();
+      toast(restore ? '已恢复这张报修单' : '已撤销，可在「我的 → 撤销与权限」里恢复');
+      /* 云存储写入有传播延迟，等几秒再拉真实数据，避免列表回跳 */
+      setTimeout(function(){ loadAll(); }, 5000);
+    }).catch(function(e){ toast(e.message || '操作失败，请重试'); });
   }
 
   /* ---------- 部门管理 ---------- */
@@ -6316,6 +6430,7 @@ function xBuildXlsx(t){
       if(j && j.ok){
         state.rateOk = true;
         rateAuthOk = true;
+        refreshSession();   /* 管理密码同时是撤销权限的管理员凭证，刷新一下会话 */
         closeRateAuth();   /* 关掉弹窗，让页面按新权限重新渲染 */
         toast('验证通过：这台设备已能看到评分');
         fetchOrders(undefined, [], 0);
@@ -6360,7 +6475,8 @@ function xBuildXlsx(t){
     fetch('/api/admin/rate-lock', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' })
       .then(function(r){ return r.json(); })
       .then(function(){
-        state.rateOk = false; rateAuthOk = false;
+        state.rateOk = false; rateAuthOk = false; cancelPwOk = false;
+        refreshSession();
         closeRateAuth();
         toast('已关闭本机评分权限');
         fetchOrders(undefined, [], 0);
@@ -6370,6 +6486,149 @@ function xBuildXlsx(t){
   $('rateAuthList').addEventListener('click', function(e){
     var del = e.target.closest ? e.target.closest('[data-rauthdel]') : null;
     if(del) delRateAuth(del.getAttribute('data-rauthdel'));
+  });
+
+  /* ---------- 撤销权限名单 + 已撤销报修单 ----------
+     名单存服务端，全员共享；报修人本人不需要进名单就能撤自己的单。 */
+  var cancelPwOk = false;
+  function renderCancelMeta(){
+    var e = mark($('cancelAuthText'));
+    if(!e) return;
+    e.textContent = state.adminOk
+      ? ('管理员 · 可撤销/恢复全部' + (state.cancelAuth.length ? '，另授权 ' + state.cancelAuth.length + ' 人' : ''))
+      : (state.cancelOk ? '已授权 · 可撤销/恢复全部报修单' : '可撤销本人报修的单');
+  }
+  function renderCancelWho(){
+    var e = mark($('cancelWho'));
+    if(!e) return;
+    var who = state.myLoginName
+      ? (state.myLoginName + (state.myEmp ? '（工号 ' + state.myEmp + '）' : ''))
+      : ('工号 ' + state.myEmp);
+    e.textContent = '当前登录：' + (who || '未识别') + ' · '
+      + (state.adminOk ? '管理员' : (state.cancelOk ? '已授权撤销人' : '报修人本人'));
+  }
+  function fetchCancelAuth(cursor, acc, guard){
+    if(!db){ state.cancelAuth = acc; renderCancelMeta(); return; }
+    if(guard > 10){ state.cancelAuth = acc; renderCancelMeta(); return; }
+    db.query({ databaseId: DB_CANCEL_AUTH, pageSize: 100, startCursor: cursor })
+      .then(function(res){
+        acc = acc.concat(res.results || []);
+        var next = res.nextCursor;
+        if(res.hasMore && next && next !== cursor && (res.results||[]).length){ fetchCancelAuth(next, acc, guard+1); }
+        else { state.cancelAuth = acc; renderCancelMeta(); renderCancelAuthList(); }
+      })
+      .catch(function(err){ console.error('[database] 撤销权限加载失败:', err); renderCancelMeta(); });
+  }
+  function renderCancelAuthList(){
+    var box = $('cancelAuthList');
+    if(!box) return;
+    var rows = state.cancelAuth, html = '';
+    for(var i=0;i<rows.length;i++){
+      var nm = String(rows[i]['姓名'] || '').trim(), ep = String(rows[i]['工号'] || '').trim();
+      if(!nm && !ep) continue;
+      html += '<div class="pm-row">'
+        + '<div class="set-main"><div class="sm-n">' + escapeHtml(nm || ('工号' + ep)) + '<~SL~div>'
+        + '<div class="sm-r">' + escapeHtml([ep ? '工号 ' + ep : '', rows[i]['备注'] || ''].filter(Boolean).join(' · ')) + '<~SL~div><~SL~div>'
+        + '<button class="btn pm-del" type="button" data-cancelauthdel="' + escapeHtml(rows[i]._id) + '">删除<~SL~button><~SL~div>';
+    }
+    if(!html) html = '<div class="empty">名单是空的：现在只有管理员和报修人本人能撤单。加姓名或工号，让其他人也能撤。<~SL~div>';
+    box.innerHTML = toEscapeHtml(html);
+  }
+  function renderCanceledList(){
+    var box = $('canceledList');
+    if(!box) return;
+    var arr = [], i, r;
+    for(i=0;i<state.orders.length;i++){ if(isCanceled(state.orders[i])) arr.push(state.orders[i]); }
+    if(!arr.length){ box.innerHTML = toEscapeHtml('<div class="empty">还没有撤销的报修单<~SL~div>'); return; }
+    var html = '';
+    for(i=0;i<arr.length;i++){
+      r = arr[i];
+      var sub = [r['工单号'], r['部门'], r['设备名称']].filter(Boolean).join(' · ');
+      var meta = '报修人 ' + (r['报修人'] || '—') + ' · ' + (r['撤销人'] || '') + ' ' + (r['撤销时间'] ? fmtDate(r['撤销时间']) : '');
+      html += '<div class="cx-row">'
+        + '<div class="cx-main"><div class="cx-t">' + escapeHtml(sub || '报修单') + '<~SL~div>'
+        + '<div class="cx-s">' + escapeHtml(meta) + '<~SL~div><~SL~div>'
+        + (canCancel(r) ? '<button class="btn btn-ghost" type="button" data-cancelrestore="' + escapeHtml(r._id) + '" style="flex:none; min-height:32px; padding:0 12px; font-size:12px">恢复<~SL~button>' : '')
+        + '<~SL~div>';
+    }
+    box.innerHTML = toEscapeHtml(html);
+  }
+  function openCancelAuth(){
+    rbOpen('cancelauth', 'cancelAuthModal');
+    $('cancelAuthModal').className = 'modal show';
+    renderCancelWho(); renderCancelMeta(); renderCanceledList();
+    if(state.adminOk || cancelPwOk) showCancelMgr(); else showCancelPw();
+    fetchCancelAuth(undefined, [], 0);
+  }
+  function closeCancelAuth(){
+    $('cancelAuthModal').className = 'modal';
+    rbClose('cancelauth');
+  }
+  function showCancelPw(){
+    $('cancelPwView').style.display = '';
+    $('cancelMgrView').style.display = 'none';
+    $('cancelPw').value = '';
+    setTimeout(function(){ try{ $('cancelPw').focus(); }catch(e){} }, 150);
+  }
+  function showCancelMgr(){
+    $('cancelPwView').style.display = 'none';
+    $('cancelMgrView').style.display = '';
+    renderCancelAuthList();
+  }
+  function checkCancelPw(){
+    var pw = ($('cancelPw').value || '').trim();
+    if(!pw){ toast('请输入管理密码'); return; }
+    fetch('/api/admin/check', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pw: pw })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if(j && j.ok){
+        cancelPwOk = true;
+        refreshSession();   /* 管理密码已写进会话，重新拉一次权限 */
+        setTimeout(function(){ showCancelMgr(); fetchCancelAuth(undefined, [], 0); renderCancelWho(); renderCancelMeta(); }, 350);
+        toast('验证通过：现在可以管理撤销权限名单');
+      } else { toast((j && j.error) || '验证失败'); }
+    }).catch(function(){ toast('验证失败，请重试'); });
+  }
+  function addCancelAuth(){
+    var nEl = $('cancelAuthName'), eEl = $('cancelAuthEmp');
+    var nm = nEl ? nEl.value.trim() : '', ep = eEl ? eEl.value.trim() : '';
+    if(!nm && !ep){ toast('姓名和工号至少填一个'); return; }
+    if(!db){ toast('离线模式，无法保存'); return; }
+    if(!(state.adminOk || cancelPwOk)){ toast('请先输入管理密码'); return; }
+    for(var i=0;i<state.cancelAuth.length;i++){
+      if((nm && String(state.cancelAuth[i]['姓名'] || '').trim() === nm)
+        || (ep && String(state.cancelAuth[i]['工号'] || '').trim() === ep)){ toast('这个人已在名单里'); return; }
+    }
+    db.addRecord({ databaseId: DB_CANCEL_AUTH, properties: {
+      '姓名': { text: nm }, '工号': { text: ep }, '备注': { text: '可撤销报修单' }
+    } }).then(function(){
+      toast('已加入撤销权限名单');
+      if(nEl) nEl.value = '';
+      if(eEl) eEl.value = '';
+      fetchCancelAuth(undefined, [], 0);
+    }).catch(function(){ toast('添加失败，请重试'); });
+  }
+  function delCancelAuth(id){
+    if(!id || !db) return;
+    db.deleteRecord({ databaseId: DB_CANCEL_AUTH, recordId: id })
+      .then(function(){ toast('已移除'); fetchCancelAuth(undefined, [], 0); })
+      .catch(function(){ toast('删除失败'); });
+  }
+  $('cancelAuthBtn').addEventListener('click', openCancelAuth);
+  $('cancelAuthClose').addEventListener('click', closeCancelAuth);
+  $('cancelAuthModal').addEventListener('click', function(e){ if(e.target === this) closeCancelAuth(); });
+  $('cancelPwOk').addEventListener('click', checkCancelPw);
+  $('cancelPw').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkCancelPw(); } });
+  $('cancelAuthAddBtn').addEventListener('click', addCancelAuth);
+  $('cancelAuthList').addEventListener('click', function(e){
+    var del = e.target.closest ? e.target.closest('[data-cancelauthdel]') : null;
+    if(del) delCancelAuth(del.getAttribute('data-cancelauthdel'));
+  });
+  $('canceledList').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-cancelrestore]') : null;
+    if(b) doCancel(b.getAttribute('data-cancelrestore'), true);
   });
 
   /* 报修表单「指定维修人」：按今天排班填充，此刻在岗的人排最前并标注时段 */
@@ -7849,6 +8108,8 @@ function xBuildXlsx(t){
       $('rateModal').className = 'modal';
     }else if(kind === 'rateauth'){
       $('rateAuthModal').className = 'modal';
+    }else if(kind === 'cancelauth'){
+      $('cancelAuthModal').className = 'modal';
     }else if(kind === 'tut'){
       $('tutModal').className = 'modal';
     }else if(kind === 'tab'){
@@ -8140,7 +8401,7 @@ function xBuildXlsx(t){
           if(hl.length) openImgView(hl, Number(btn.getAttribute('data-ix')) || 0);
         }
       }
-      else if(act === 'del') doDelete(id);
+      else if(act === 'cancel' || act === 'del') doCancel(id, false);
     });
     $('deptManageList').addEventListener('click', function(e){
       var item = e.target.closest('[data-rec]');

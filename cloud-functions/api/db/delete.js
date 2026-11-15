@@ -7,7 +7,7 @@ export default async function onRequest(context) {
   if (!sess) return json({ error: 'not login' }, 401);
   const body = await readBody(context.request);
   try {
-    return json(await db.del(body));
+    return json(await db.del(body, sess));
   } catch (e) {
     return json({ error: e.error || 'error' }, e.status || 500);
   }
