@@ -1,7 +1,7 @@
 import { json, readBody } from '../../../lib/util.js';
 import { getSession } from '../../../lib/auth.js';
 import { readTable } from '../../../lib/store.js';
-import { tutorial, orderDb } from '../../../lib/ai.js';
+import { tutorial, orderDb, orderSnapshot } from '../../../lib/ai.js';
 
 export default async function onRequest(context) {
   const sess = await getSession(context.request);
@@ -9,8 +9,13 @@ export default async function onRequest(context) {
   const body = await readBody(context.request);
   const rid = String(body.recordId || '').trim();
   if (!rid) return json({ ok: false, error: 'recordId 缺失' }, 400);
-  const table = await readTable(orderDb());
-  const row = (table.list || []).find(r => r._id === rid);
+  let row = null;
+  if (body.order && typeof body.order === 'object' && Object.keys(body.order).length) {
+    row = orderSnapshot(body.order, rid);
+  } else {
+    const table = await readTable(orderDb());
+    row = (table.list || []).find(r => r._id === rid) || null;
+  }
   if (!row) return json({ ok: false, error: '工单不存在' }, 404);
   try {
     const res = await tutorial(row);

@@ -60,6 +60,7 @@ button{font-family:inherit;cursor:pointer;border:none;min-height:44px}
 .btn:disabled{opacity:.55;cursor:default}
 .btn-ghost{background:var(--blue-bg);color:var(--primary)}
 .btn-violet{background:var(--violet-bg);color:var(--violet)}
+.btn-ai{background:var(--blue-bg);color:var(--primary);box-shadow:inset 0 0 0 1px rgba(26,111,235,.28)}
 .btn-done{background:var(--green-bg);color:var(--green)}
 .btn-del{background:transparent;color:var(--muted);font-size:12px;min-height:32px;padding:0 8px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -83,7 +84,7 @@ button{font-family:inherit;cursor:pointer;border:none;min-height:44px}
 body.dark .mode-btn.primary{border-color:#2b4a72}
 .grp-text{width:100%;min-height:150px;font-size:13px;line-height:1.7;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--input);color:var(--text);font-family:inherit;resize:vertical}
 .grp-tip{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
-.order{border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
+.order{border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card);cursor:pointer}
 .order.overdue{border-left-color:var(--red)}
 .order-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .order-title{font-weight:700;font-size:15px}
@@ -1851,9 +1852,10 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       else if(k==='done'){
         var _rOK = canRate();
         var _avg = _rOK ? rateAvg(parseRate(r['评分'])) : 0;
-        actions = '<button class="btn btn-ghost" data-act="ai">AI 诊断<~SL~button>'
-          + (_rOK ? '<button class="btn btn-ghost" data-act="rate">' + (_avg ? '改评分 ' + _avg.toFixed(1) : '评分') + '<~SL~button>' : '');
+        actions = (_rOK ? '<button class="btn btn-ghost" data-act="rate">' + (_avg ? '改评分 ' + _avg.toFixed(1) : '评分') + '<~SL~button>' : '');
       }
+      /* 任何状态的报修单都能点开 AI 诊断：刚报的新单也要能先看原因推断和排查建议 */
+      actions = '<button class="btn btn-ai" data-act="ai">AI 诊断<~SL~button>' + actions;
       var picked = !!state.selIds[r._id];
       html += '<div class="order'+(od?' overdue':'')+'" data-rec="'+escapeHtml(r._id)+'">'
         + '<div class="order-head">'
@@ -2967,6 +2969,25 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       }
       /* 这次填的设备如果清单里还没有，自动收进设备台账，下次所有人直接选 */
       if(nos.length) devAutoCollect(okItems);
+      /* 报完一张单立刻给出这张新单的 AI 诊断。用刚提交的字段做快照，
+         不用等云存储同步完，维修人员点开就能看原因推断和排查建议。
+         一次报多张时不弹窗打断，每张单上都有「AI 诊断」按钮可点开。 */
+      if(nos.length === 1){
+        var _first = okItems[0] || {};
+        var _tmpId = 'new:' + nos[0];
+        var _tmpRow = {
+          _id: _tmpId,
+          '工单号': nos[0], '部门': dept, '车间': sub,
+          '设备名称': _first.device || '', '故障部位': _first.part || '',
+          '故障类别': _first.cat || '', '优先级': _first.pri || '',
+          '故障描述': _first.fault || '', '报修人': reporter,
+          '报修日期': date ? new Date(date + 'T00:00:00').toISOString() : '',
+          '维修状态': pick ? ST.assigned : ST.wait,
+          '维修人员': pick || '',
+          '维修结果': pick ? ('已派给 ' + pick) : ''
+        };
+        setTimeout(function(){ openAiAnalysis(_tmpId, false, false, _tmpRow); }, 600);
+      }
       loadAll();
     }).catch(function(err){
       console.error('[database] 提交异常:', err);
@@ -3711,7 +3732,21 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   $('rateModal').addEventListener('click', function(e){ if(e.target === this) rateClose(); });
 
   /* ---------- AI 诊断分析 ---------- */
-  var aiState = { id: '', fromFinish: false };
+  var aiState = { id: '', fromFinish: false, row: null };
+  var AI_FIELDS = ['工单号','部门','车间','设备名称','故障部位','故障类别','故障描述',
+                   '优先级','报修人','报修日期','维修人员','维修状态','维修结果',
+                   '完成人','完成日期','挂起原因'];
+  /* 只把诊断要用的字段随请求带上：新单刚提交、云端还没同步时也能立刻出诊断，
+     同时不把挂起照片这类 base64 大字段塞进边缘函数请求 */
+  function aiSnapshot(row, id){
+    if(!row) return null;
+    var o = {}, got = 0;
+    for(var i=0;i<AI_FIELDS.length;i++){
+      var k = AI_FIELDS[i], v = row[k];
+      if(v !== undefined && v !== null && v !== ''){ o[k] = v; got++; }
+    }
+    return got ? o : null;
+  }
   var aiSwallow = 0;   /* 关闭 AI 弹窗时吞掉自己触发的 popstate，避免“关掉又立刻打开”被旧事件误关 */
   function aiClose(){
     $('aiModal').className = 'modal';
@@ -3734,14 +3769,20 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       }, 360);
     }
   }
-  function openAiAnalysis(id, force, fromFinish){
-    var row = findOrder(id);
+  function openAiAnalysis(id, force, fromFinish, inlineRow){
+    /* inlineRow：刚提交、云端还没同步的新单，直接用本地这份字段分析 */
+    var row = findOrder(id) || inlineRow || null;
     aiState.id = id;
+    aiState.row = row;
     aiState.fromFinish = !!fromFinish;
-    $('aiRate').style.display = canRate() ? '' : 'none';   /* 没评分权限的人看不到「评分」按钮 */
+    var done = row && stKey(row['维修状态']) === 'done';
+    $('aiRate').style.display = (canRate() && done) ? '' : 'none';   /* 评分仍只对管理员、且只给已完成的单 */
     $('aiTitle').textContent = 'AI 诊断分析' + (row && row['设备名称'] ? ' · ' + row['设备名称'] : '');
     $('aiSub').textContent = row
-      ? ((row['工单号'] || '') + ' · ' + (row['故障部位'] || '未填部位') + (row['完成人'] ? ' · 完成人 ' + row['完成人'] : ''))
+      ? ((row['工单号'] || '') + ' · ' + (row['故障部位'] || '未填部位')
+          + ' · ' + (stText(row['维修状态']) || '待处理')
+          + (row['报修人'] ? ' · 报修人 ' + row['报修人'] : '')
+          + (row['完成人'] ? ' · 完成人 ' + row['完成人'] : ''))
       : '';
     var cached = row && row['AI分析'];
     rbOpen('ai', 'aiModal');
@@ -3759,18 +3800,17 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recordId: id })
+      body: JSON.stringify({ recordId: id, order: aiSnapshot(aiState.row || findOrder(id), id) })
     }).then(function(r){
       return r.text().then(function(t){
         var j = null;
         try { j = JSON.parse(t); } catch(e){ j = null; }
-        if(!r.ok) throw new Error((j && j.error) || ('分析服务返回 ' + r.status));
+        if(!r.ok) throw new Error(r.status === 401 ? '请先登录维修台后再看 AI 诊断' : ((j && j.error) || ('分析服务返回 ' + r.status)));
         return j || {};
       });
     }).then(function(j){
       if(!j.ok) throw new Error(j.error || '分析失败');
       renderAi(j);
-      loadAll();
     }).catch(function(e){
       $('aiBody').innerHTML = '<div class="empty">分析失败：' + escapeHtml(e.message || '请稍后重试') + '</div>';
     });
@@ -3813,7 +3853,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   function openTutorial(id){
     if(!id) return;
     tutState.id = id; tutState.kw = '';
-    var row = findOrder(id);
+    var row = aiState.row || findOrder(id);
     $('tutTitle').textContent = 'AI 搜索教程' + (row && row['故障部位'] ? ' · ' + row['故障部位'] : '');
     $('tutSub').textContent = row
       ? ((row['设备名称'] || '') + ' · ' + String(row['故障描述'] || '').slice(0, 26))
@@ -3825,12 +3865,12 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recordId: id })
+      body: JSON.stringify({ recordId: id, order: aiSnapshot(row, id) })
     }).then(function(r){
       return r.text().then(function(t){
         var j = null;
         try { j = JSON.parse(t); } catch(e){ j = null; }
-        if(!r.ok) throw new Error((j && j.error) || ('教程服务返回 ' + r.status));
+        if(!r.ok) throw new Error(r.status === 401 ? '请先登录维修台后再看教程' : ((j && j.error) || ('教程服务返回 ' + r.status)));
         return j || {};
       });
     }).then(function(j){
@@ -7896,8 +7936,10 @@ function xBuildXlsx(t){
       if(pk){ togglePick(pk.getAttribute('data-pick')); return; }
       var item = e.target.closest('[data-rec]');
       var btn = e.target.closest('[data-act]');
-      if(!item || !btn) return;
+      if(!item) return;
       var id = item.getAttribute('data-rec');
+      /* 点工单卡片本身（标题 / 故障描述 / 空白处）= 点开这张单的 AI 诊断 */
+      if(!btn){ openAiAnalysis(id, false); return; }
       var act = btn.getAttribute('data-act');
       if(act === 'assign') doAssign(id);
       else if(act === 'start') doStart(id);
