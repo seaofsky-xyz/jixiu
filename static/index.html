@@ -125,7 +125,7 @@ body.dark .mode-btn.primary{border-color:#2b4a72}
 .dept-wrap{display:contents}
 .sub-wrap{grid-column:1/-1;display:none}
 .sub-wrap.open{display:block}
-.sub-toggle{width:100%;border:1px dashed var(--line);background:transparent;color:var(--primary);font-size:12px;font-weight:600;border-radius:10px;min-height:36px;margin-top:-4px}
+.sub-toggle{grid-column:1/-1;width:100%;border:1px dashed var(--line);background:transparent;color:var(--primary);font-size:12px;font-weight:600;border-radius:10px;min-height:36px;margin-top:-4px}
 .sub-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;padding-left:10px;border-left:2px solid var(--blue-bg)}
 .sub-dept{display:flex;flex-direction:column;gap:2px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--card);min-height:44px;text-align:left}
 .sub-dept.sel{border-color:var(--primary);background:var(--blue-bg)}
@@ -431,6 +431,10 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
 .dev-btn{flex:none;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--pri);font-size:13px;font-weight:600;padding:0 11px;cursor:pointer;min-height:42px;white-space:nowrap;font-family:inherit}
 .dev-btn:active{background:var(--pri-bg)}
 .dev-search{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:var(--input);color:var(--text);font-family:inherit}
+.dev-scope{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:12.5px;color:var(--muted);background:var(--blue-bg);border-radius:10px;padding:8px 10px;line-height:1.5}
+.dev-scope b{color:var(--primary);font-weight:700}
+.dev-scope .ds-btn{margin-left:auto;flex:none;border:1px solid var(--line);background:var(--card);color:var(--primary);border-radius:8px;padding:4px 9px;font-size:12px;font-weight:600;font-family:inherit;min-height:30px}
+.dev-scope select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;background:var(--input);color:var(--text);font-family:inherit;max-width:100%}
 .dev-list{max-height:44vh;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px;margin:10px 0;background:var(--card)}
 .dev-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer}
 .dev-item:last-child{border-bottom:0}
@@ -1140,6 +1144,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     <div data-page-node-id="2rQkiKUzOnUkg21uSd9QI8" class="modal-title" id="devModalTitle"><!--pnid:aAEjy130DXcDEPZI8KnSLC-->选择设备</div>
     <div data-page-node-id="J8rM9aZRoiyuscLUhrKLKU" class="modal-sub" id="devModalSub"><!--pnid:MM67i2uIdSpPwjDOIZF0QX-->点一下就填进「设备 / 地点」，常用故障部位一起带上</div>
     <div data-page-node-id="TUsLo8468YptGSlJHyUZGk" id="devPickView">
+      <div class="dev-scope" id="devScopeBar"></div>
       <input data-page-node-id="ej2w6CAJwoKj2GFtpUMAMt" class="dev-search" id="devSearch" placeholder="搜索设备名 / 车间" type="text">
       <div data-page-node-id="r9KuuwlCcTdE1UUoELAFu0" class="dev-list" id="devList"></div>
       <div data-page-node-id="OQf6cRlU2kHrAanLGhULyD" class="dev-tools">
@@ -1151,6 +1156,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     <div data-page-node-id="0UyT3PnDFr1lRvkq8Md268" id="devEditView" style="display:none">
       <div data-page-node-id="YtGmkRStq347BOYsyvA1h9" class="form-grid">
         <div data-page-node-id="YexwSjdimWJ2sfqoCVYcX0" class="f-item full"><label data-page-node-id="xyG8gkouYVAbk4pUxHJBiY"><!--pnid:8h0StY4x7DrVO6XRbnyiny-->设备名称 *</label><input data-page-node-id="zhA3OVoNNR9LqoUM8UGal7" id="devName" placeholder="如：固体车间中央空调" type="text"></div>
+        <div class="f-item full"><label for="devDept">所属部门</label><select id="devDept"></select></div>
         <div data-page-node-id="IXMUJgevN4AsDiXzkRFgbM" class="f-item"><label data-page-node-id="QScZfHKavXAetOD2ORwL3g"><!--pnid:CxXoHkjuPKpANgiCFNZt2J-->车间 / 地点</label><input data-page-node-id="55WIcpPrZL2gNvi0TzfKD7" id="devArea" placeholder="如：固体车间" type="text"></div>
         <div data-page-node-id="Hth7oeTDgvPPryhKRnPYl0" class="f-item"><label data-page-node-id="zYl5ALN9REHak8cKbCz0CX"><!--pnid:1WYtV49DOAdtbphpDKpNYi-->常用故障部位</label><input data-page-node-id="3yJwrL6qFgyr020gt7OTj8" id="devPart" placeholder="如：制冷机组" type="text"></div>
       </div>
@@ -1166,14 +1172,19 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   <div data-page-node-id="GCIhUXiz64OOUmmDviZb53" class="modal-box dev-box">
     <div data-page-node-id="lbaYqXvjQCis0BTM9AEo8E" class="modal-title"><!--pnid:zeiABfeRNXDtIzzywKun3s-->设备清单管理</div>
     <div data-page-node-id="U5fMMoH3y8YlnPKXpECG6i" class="modal-sub" id="devManageSub"><!--pnid:FKiLaKKDmn8C4gy6lXb6ZP-->共 0 台</div>
+    <div class="dev-scope" style="margin-top:4px">
+      <span>归属 / 查看</span><select id="devManageScope"></select>
+      <span style="font-size:11.5px">选部门后只显示该部门设备，新增、批量添加也归到这里</span>
+    </div>
     <div data-page-node-id="rumgeSLCbYFSqfb3oZvhoQ" class="dev-list" id="devManageList"></div>
     <div data-page-node-id="Dr3BuHgEh9sgIXdbU7Y10q" class="dev-tools" style="margin-top:10px">
-      <button data-page-node-id="OxRAMo1rjom0GbDIGNtnQD" class="btn" id="devBulkBtn" type="button"><!--pnid:ghnucm5x3jIU5UvwtJzjLg-->批量添加</button>
+      <button class="btn" id="devManageAdd" type="button">＋ 新增单台</button>
+      <button data-page-node-id="OxRAMo1rjom0GbDIGNtnQD" class="btn btn-ghost" id="devBulkBtn" type="button"><!--pnid:ghnucm5x3jIU5UvwtJzjLg-->批量添加</button>
       <button data-page-node-id="SNSmRMNbnnzxLkpl1cFcP8" class="btn btn-ghost" id="devImportBtn" type="button"><!--pnid:Hg0ZRfzcjSAGC8w4gOB4Ji-->从历史工单导入</button>
       <button data-page-node-id="xKbq29fyLEuFCxnKsZSkG8" class="btn btn-ghost" id="devManageClose" type="button"><!--pnid:GxvbmdKrEcDgMiH6wb9noZ-->完成</button>
     </div>
     <div data-page-node-id="QLRVXeUMgNb691akthHS2T" id="devBulkBox" style="display:none; margin-top:10px">
-      <div data-page-node-id="NUxINxN7akwBo7VR5qxciN" class="modal-sub" style="margin:6px 0"><!--pnid:uEDfxUiOfrwwy0u6OJghSF-->一行一台，格式：设备名称｜车间｜常用故障部位（后两项可省略）</div>
+      <div data-page-node-id="NUxINxN7akwBo7VR5qxciN" class="modal-sub" style="margin:6px 0"><!--pnid:uEDfxUiOfrwwy0u6OJghSF-->一行一台：设备名称｜车间｜常用故障部位（可省略）。已选到具体车间时，第二列直接写故障部位即可；部门按上方「归属」自动带入。</div>
       <textarea data-page-node-id="Pv3psIJ8SgtsyLrh7B5YJG" class="dev-bulk-in" id="devBulkText" placeholder="固体车间中央空调｜固体车间｜制冷机组&#10;1洗瓶机｜机修组｜2#机械式故障" rows="5"></textarea>
       <div data-page-node-id="ldXkUHeHeMSVo9lnCAFfIp" class="dev-tools" style="margin-top:8px">
         <button data-page-node-id="Z8k43fqbq5PkFJgfwSXlqa" class="btn" id="devBulkSave" type="button"><!--pnid:Vrf8zLYbS282OOoJ7a4Jao-->保存这批设备</button>
@@ -1698,19 +1709,20 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         + '<span data-display="dept_name">'+escapeHtml(nm)+'<~SL~span>'
         + (kids.length ? '<span class="b-sub">'+kids.length+' 个下级<~SL~span>' : '')
         + '<~SL~div>'
-        + '<div class="dept-meta" data-display="owner">负责人 '+(d['负责人']?escapeHtml(d['负责人']):'—')+' · '+(d['房间数']||0)+' 个房间 · '+(d['设备数']||0)+' 台设备<~SL~div>'
+        + '<div class="dept-meta" data-display="owner">负责人 '+(d['负责人']?escapeHtml(d['负责人']):'—')+' · '+(d['房间数']||0)+' 个房间 · '+(d['设备数']||0)+' 台设备'
+        + ' · <span class="dev-cnt" data-devcount="'+escapeHtml(nm)+'" data-child="0">已录 '+devCountOfDept(nm)+' 台<~SL~span><~SL~div>'
         + '<~SL~button>';
       if(kids.length){
-        html += '<div class="sub-wrap'+(open?' open':'')+'">'
-          + '<button type="button" class="sub-toggle" data-toggle="'+escapeHtml(nm)+'">'
-          + (open ? '收起下级' : '展开报修 · '+escapeHtml(nm)) + '<~SL~button>'
-          + '<div class="sub-list">';
+        html += '<button type="button" class="sub-toggle" data-toggle="'+escapeHtml(nm)+'">'
+          + (open ? '收起车间 · '+escapeHtml(nm) : '选择车间 · '+escapeHtml(nm)) + '<~SL~button>';
+        html += '<div class="sub-wrap'+(open?' open':'')+'"><div class="sub-list">';
         for(var j=0;j<kids.length;j++){
           var k = kids[j], kn = deptName(k);
           var ksel = (state.selDept === nm && state.selSub === kn) ? ' sel' : '';
           html += '<button type="button" class="sub-dept'+ksel+'" data-dept="'+escapeHtml(nm)+'" data-sub="'+escapeHtml(kn)+'">'
             + '<span class="sub-name">'+escapeHtml(kn)+'<~SL~span>'
-            + '<span class="sub-meta">负责人 '+(k['负责人']?escapeHtml(k['负责人']):'—')+' · '+(k['设备数']||0)+' 台设备<~SL~span>'
+            + '<span class="sub-meta">负责人 '+(k['负责人']?escapeHtml(k['负责人']):'—')+' · '+(k['设备数']||0)+' 台设备'
+            + ' · <span class="dev-cnt" data-devcount="'+escapeHtml(kn)+'" data-child="1">已录 '+devCountOfDept(kn, true)+' 台<~SL~span><~SL~span>'
             + '<~SL~button>';
         }
         html += '<~SL~div><~SL~div>';
@@ -2200,11 +2212,92 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     return {
       id: String(r._id || r.id || ''),
       name: devTrim(r['设备名称']),
+      dept: devTrim(r['所属部门']),
       area: devTrim(r['车间']),
       part: devTrim(r['常用故障部位']),
       sort: Number(r['排序'] || 0) || 0,
       off: devIsOff(r['状态'])
     };
+  }
+  /* 老台账只填了「车间」没写「所属部门」：按车间名去部门表里反查它属于哪个大部门 */
+  function devDeptOf(d){
+    if(d.dept) return d.dept;
+    if(!d.area) return '';
+    for(var i=0;i<state.depts.length;i++){
+      var one = state.depts[i], nm = deptName(one);
+      if(nm === d.area) return deptParent(one) || nm;
+    }
+    return '';
+  }
+  /* 报修页此刻选的部门范围：大部门 + 小部门 / 车间 */
+  function devScope(){
+    var dv = $('fDept') ? $('fDept').value : '';
+    var fsw = $('fSubWrap'), fs = $('fSub');
+    var sv = (fsw && fsw.style.display !== 'none' && fs && !fs.disabled) ? fs.value : '';
+    var dept = dv, sub = '';
+    var i = dv.indexOf(' / ');
+    if(i > -1){ dept = dv.slice(0, i); sub = dv.slice(i + 3); }
+    if(sv) sub = sv;
+    return { dept: devTrim(dept), sub: devTrim(sub) };
+  }
+  function devScopeLabel(sc){
+    if(!sc.dept) return '未选部门';
+    return sc.dept + (sc.sub ? ' / ' + sc.sub : '（含全部车间）');
+  }
+  function devParseScope(v){
+    var s = devTrim(v || ''), i = s.indexOf(' / ');
+    return i > -1 ? { dept: s.slice(0, i), sub: s.slice(i + 3) } : { dept: s, sub: '' };
+  }
+  var devShowAll = false;   /* 设备选择面板里「临时看全部」的开关，默认严格按部门筛 */
+  function devInScope(d, sc, ignoreAll){
+    if(!ignoreAll && devShowAll) return true;
+    if(!sc || !sc.dept) return true;
+    var dd = devDeptOf(d);
+    if(sc.sub){
+      if(dd && dd !== sc.dept) return false;
+      return (d.area || '') === sc.sub;
+    }
+    return dd === sc.dept;
+  }
+  /* 部门 / 车间下拉的公共选项：值形如「质量部」或「质量部 / 微生物车间」 */
+  function devScopeOptions(sel, withAll, allText){
+    if(!sel) return;
+    while(sel.options.length) sel.remove(0);
+    function add(v, t){ var o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); }
+    if(withAll) add('', allText || '全部部门');
+    var tops = topDepts();
+    for(var i=0;i<tops.length;i++){
+      var nm = deptName(tops[i]);
+      add(nm, nm + '（部门本级）');
+      var kids = childrenOf(nm);
+      for(var j=0;j<kids.length;j++){
+        var kn = deptName(kids[j]);
+        add(nm + ' / ' + kn, nm + ' / ' + kn);
+      }
+    }
+  }
+  /* 部门卡片上的「已录 N 台」按台账实际数量算，跟选择面板保持一致 */
+  function devCountOfDept(nm, isChild){
+    var n = 0, parent = nm;
+    if(isChild){
+      for(var j=0;j<state.depts.length;j++){
+        if(deptName(state.depts[j]) === nm){ parent = deptParent(state.depts[j]) || nm; break; }
+      }
+    }
+    for(var i=0;i<devList.length;i++){
+      var d = devList[i];
+      if(d.off) continue;
+      if(isChild){ if(devDeptOf(d) === parent && (d.area || '') === nm) n++; }
+      else if(devDeptOf(d) === nm) n++;
+    }
+    return n;
+  }
+  function refreshDeptCounts(){
+    var els = $('deptGrid') ? $('deptGrid').querySelectorAll('[data-devcount]') : [];
+    for(var i=0;i<els.length;i++){
+      var e = els[i];
+      e.textContent = '已录 ' + devCountOfDept(e.getAttribute('data-devcount'), e.getAttribute('data-child') === '1') + ' 台';
+    }
   }
   function devCacheRead(){
     try{
@@ -2222,8 +2315,12 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     for(var i=0;i<devList.length;i++){ if((devList[i].sort||0) > m) m = devList[i].sort || 0; }
     return m;
   }
-  function devFind(name){
-    for(var i=0;i<devList.length;i++){ if(devList[i].name === name) return devList[i]; }
+  function devFind(name, dept){
+    for(var i=0;i<devList.length;i++){
+      if(devList[i].name !== name) continue;
+      if(dept !== undefined && (devList[i].dept || '') !== dept) continue;
+      return devList[i];
+    }
     return null;
   }
   function loadDevices(cb){
@@ -2232,7 +2329,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   }
   function fetchDevices(cursor, acc, guard, cb){
     if(guard > 20){
-      devList = acc.map(devNorm).sort(devSort); devCacheWrite(); renderDevCount();
+      devList = acc.map(devNorm).sort(devSort); devCacheWrite(); renderDevCount(); refreshDeptCounts();
       if(cb) cb();
       return;
     }
@@ -2243,14 +2340,14 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         if(res.hasMore && next && next !== cursor && (res.results || []).length){ fetchDevices(next, acc, guard + 1, cb); }
         else {
           devList = acc.map(devNorm).sort(devSort);
-          devCacheWrite(); renderDevCount(); renderDevPick();
+          devCacheWrite(); renderDevCount(); refreshDeptCounts(); renderDevPick();
           if($('devManageModal') && $('devManageModal').className.indexOf('show') > -1) renderDevManage();
           if(cb) cb();
         }
       })
       .catch(function(err){
         console.error('[database] 设备清单加载失败:', err);
-        devList = devCacheRead(); renderDevCount();
+        devList = devCacheRead(); renderDevCount(); refreshDeptCounts();
         if(cb) cb();
       });
   }
@@ -2258,27 +2355,51 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     var a = $('devCount');
     if(a) a.textContent = devList.length + ' 台';
   }
-  function devMatch(kw){
+  function devMatch(kw, sc){
     kw = devTrim(kw).toLowerCase();
     var out = [];
     for(var i=0;i<devList.length;i++){
       var d = devList[i];
       if(d.off) continue;
-      if(kw && (d.name + ' ' + d.area + ' ' + d.part).toLowerCase().indexOf(kw) < 0) continue;
+      if(!devInScope(d, sc || devScope())) continue;
+      if(kw && (d.name + ' ' + d.dept + ' ' + d.area + ' ' + d.part).toLowerCase().indexOf(kw) < 0) continue;
       out.push(d);
     }
     return out;
   }
   function devMeta(d){
-    if(d.area && d.part) return d.area + ' · ' + d.part;
-    return d.area || d.part || '';
+    var bits = [];
+    if(d.dept) bits.push(d.dept);
+    if(d.area && d.area !== d.dept) bits.push(d.area);
+    if(d.part) bits.push(d.part);
+    return bits.join(' · ');
   }
   function renderDevPick(){
     var box = $('devList');
     if(!box) return;
-    var arr = devMatch($('devSearch') ? $('devSearch').value : '');
+    var sc = devScope();
+    var label = devScopeLabel(sc);
+    var total = 0;
+    for(var t=0;t<devList.length;t++){ if(!devList[t].off && devInScope(devList[t], sc)) total++; }
+    var bar = $('devScopeBar');
+    if(bar){
+      var bh = '<span>当前：<b>' + escapeHtml(devShowAll ? '全部部门' : label) + '</b> · ' + total + ' 台</span>'
+        + '<button type="button" class="ds-btn" data-devall="1">' + (devShowAll ? '按部门筛选' : '临时看全部') + '<~SL~button>';
+      if(!sc.dept && !devShowAll) bh += '<span style="width:100%">先在报修页选好部门 / 车间，这里就只列那个部门的设备<~SL~span>';
+      bar.innerHTML = toEscapeHtml(bh);
+    }
+    var arr = devMatch($('devSearch') ? $('devSearch').value : '', sc);
     if(!arr.length){
-      box.innerHTML = toEscapeHtml('<div class="dev-empty">' + (devList.length ? '没有匹配的设备' : '设备清单还是空的') + '<br>点下面「＋ 新增设备」，加一次以后都能直接选<~SL~div>');
+      var why;
+      if(devShowAll) why = '没有匹配的设备';
+      else if(!sc.dept) why = '先在报修页选部门 / 车间，设备会按部门自动筛出来';
+      else {
+        var rest = 0;
+        for(var u=0;u<devList.length;u++){ if(!devList[u].off && !devDeptOf(devList[u])) rest++; }
+        why = '「' + escapeHtml(label) + '」下还没有设备<br>点下面「＋ 新增设备」加进去，以后大家报修直接选'
+          + (rest ? '<br>（另有 ' + rest + ' 台老设备还没归到部门，点右上「临时看全部」可查看）' : '');
+      }
+      box.innerHTML = toEscapeHtml('<div class="dev-empty">' + why + '<~SL~div>');
       return;
     }
     var h = '';
@@ -2291,18 +2412,29 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     }
     box.innerHTML = toEscapeHtml(h);
   }
+  function renderDevPickIfOpen(){
+    if($('devModal') && $('devModal').className.indexOf('show') > -1 && $('devPickView').style.display !== 'none'){
+      devShowAll = false;   /* 换了部门就回到按部门筛选 */
+      renderDevPick();
+    }
+  }
   function renderDevManage(){
     var box = $('devManageList');
     if(!box) return;
+    var sc = $('devManageScope') ? devParseScope($('devManageScope').value) : { dept: '', sub: '' };
+    var arr = [];
+    for(var q=0;q<devList.length;q++){ if(devInScope(devList[q], sc, true)) arr.push(devList[q]); }
     var s = $('devManageSub');
-    if(s) s.textContent = '共 ' + devList.length + ' 台 · 报修时点「选择」直接挑';
-    if(!devList.length){
-      box.innerHTML = toEscapeHtml('<div class="dev-empty">还没有设备<br>点「批量添加」一行一台录进来<~SL~div>');
+    if(s) s.textContent = '共 ' + devList.length + ' 台'
+      + (sc.dept ? (' · 「' + devScopeLabel(sc) + '」' + arr.length + ' 台') : ' · 报修时点「选择」直接挑');
+    if(!arr.length){
+      box.innerHTML = toEscapeHtml('<div class="dev-empty">' + (devList.length ? '这个部门 / 车间下还没有设备' : '还没有设备')
+        + '<br>点「＋ 新增单台」或「批量添加」录进来<~SL~div>');
       return;
     }
     var h = '';
-    for(var i=0;i<devList.length;i++){
-      var d = devList[i], meta = devMeta(d);
+    for(var i=0;i<arr.length;i++){
+      var d = arr[i], meta = devMeta(d);
       h += '<div class="dev-item" style="cursor:default">'
         + '<span class="dev-nm">' + escapeHtml(d.name)
         + (meta ? ('<span class="dev-meta">' + escapeHtml(meta) + '<~SL~span>') : '')
@@ -2314,10 +2446,11 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
   }
   function openDevPick(input){
     devPickInput = input || null;
+    devShowAll = false;
     $('devPickView').style.display = '';
     $('devEditView').style.display = 'none';
     $('devModalTitle').textContent = '选择设备';
-    $('devModalSub').textContent = '点一下就填进「设备 / 地点」，常用故障部位一起带上';
+    $('devModalSub').textContent = '按报修页选的部门 / 车间列设备，点一下就填进去（常用故障部位一起带上）';
     if($('devSearch')) $('devSearch').value = '';
     renderDevPick();
     $('devModal').className = 'modal show';
@@ -2338,14 +2471,19 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     closeDevPick();
     toast('已选择：' + d.name);
   }
-  function openDevEdit(d){
+  function openDevEdit(d, preset){
     devEditing = d ? d.id : '';
     $('devPickView').style.display = 'none';
     $('devEditView').style.display = '';
     $('devModalTitle').textContent = d ? '编辑设备' : '新增设备';
-    $('devModalSub').textContent = d ? '改完点保存，所有人都会看到' : '填一次，以后报修直接选，不用再打设备名';
+    $('devModalSub').textContent = d ? '改完点保存，所有人都会看到'
+      : '归到所选部门 / 车间，填一次以后报修直接选，不用再打设备名';
+    devScopeOptions($('devDept'), true, '不指定部门');
+    /* 新增时自动带上报修页当前选的部门 / 车间，或管理页选的归属 */
+    var sc = d ? { dept: d.dept || '', sub: d.area || '' } : (preset || devScope());
+    $('devDept').value = sc.dept || '';
     $('devName').value = d ? d.name : ($('devSearch') ? $('devSearch').value : '');
-    $('devArea').value = d ? d.area : '';
+    $('devArea').value = d ? d.area : (sc.sub || '');
     $('devPart').value = d ? d.part : '';
     $('devModal').className = 'modal show';
   }
@@ -2353,33 +2491,34 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     $('devEditView').style.display = 'none';
     $('devPickView').style.display = '';
     $('devModalTitle').textContent = '选择设备';
-    $('devModalSub').textContent = '点一下就填进「设备 / 地点」，常用故障部位一起带上';
+    $('devModalSub').textContent = '按报修页选的部门 / 车间列设备，点一下就填进去（常用故障部位一起带上）';
     renderDevPick();
   }
   function devSave(){
     var name = devTrim($('devName').value);
     if(!name){ toast('请填设备名称'); return; }
+    var dept = $('devDept') ? devTrim($('devDept').value) : '';
     var area = devTrim($('devArea').value);
     var part = devTrim($('devPart').value);
     if(!devEditing){
-      var same = devFind(name);
+      var same = devFind(name, dept);
       if(same){ toast('清单里已有「' + name + '」'); devFill(same); return; }
     }
     var sort = devMaxSort() + 1;
     if(!db){
       if(devEditing){
         for(var i=0;i<devList.length;i++){
-          if(devList[i].id === devEditing){ devList[i].name = name; devList[i].area = area; devList[i].part = part; }
+          if(devList[i].id === devEditing){ devList[i].name = name; devList[i].dept = dept; devList[i].area = area; devList[i].part = part; }
         }
         devEditing = '';
         devCacheWrite(); renderDevCount(); devModalBack(); toast('已保存（仅本机）');
         return;
       }
-      var rec = { id: 'local_' + (new Date().getTime()), name: name, area: area, part: part, sort: sort, off: false };
+      var rec = { id: 'local_' + (new Date().getTime()), name: name, dept: dept, area: area, part: part, sort: sort, off: false };
       devList.push(rec); devList.sort(devSort); devCacheWrite(); renderDevCount(); devFill(rec);
       return;
     }
-    var props = { '设备名称': { text: name }, '车间': { text: area }, '常用故障部位': { text: part } };
+    var props = { '设备名称': { text: name }, '所属部门': { text: dept }, '车间': { text: area }, '常用故障部位': { text: part } };
     var job;
     if(devEditing){
       job = db.updateRecord({ databaseId: DB_DEV, recordId: devEditing, properties: props });
@@ -2397,7 +2536,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       toast(wasEdit ? '已保存' : '已加入设备清单');
       loadDevices(function(){
         if(!wasEdit){
-          var found = devFind(name);
+          var found = devFind(name, dept);
           if(found) devFill(found); else devModalBack();
         } else {
           devModalBack();
@@ -2415,36 +2554,43 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     var base = devMaxSort();
     if(!db){
       for(var i=0;i<list.length;i++){
-        devList.push({ id: 'local_' + (new Date().getTime()) + '_' + i, name: list[i].name, area: list[i].area, part: list[i].part, sort: base + 1 + i, off: false });
+        devList.push({ id: 'local_' + (new Date().getTime()) + '_' + i, name: list[i].name, dept: list[i].dept || '', area: list[i].area, part: list[i].part, sort: base + 1 + i, off: false });
       }
       devList.sort(devSort); devCacheWrite(); renderDevCount(); renderDevManage(); renderDevPick();
       toast(okText || ('已添加 ' + list.length + ' 台（仅本机）'));
       return;
     }
-    var jobs = [];
-    for(var k=0;k<list.length;k++){
-      jobs.push(db.addRecord({ databaseId: DB_DEV, properties: {
-        '设备名称': { text: list[k].name },
-        '车间': { text: list[k].area || '' },
-        '常用故障部位': { text: list[k].part || '' },
-        '排序': { number: base + 1 + k },
+    /* 逐台串行写入：云存储是「读整表 → 改 → 写回」，并发写会互相覆盖丢记录 */
+    toast('正在保存 ' + list.length + ' 台设备…');
+    var idx = 0;
+    function stepAdd(){
+      if(idx >= list.length){
+        loadDevices(function(){
+          renderDevManage(); renderDevPick();
+          toast(okText || ('已添加 ' + list.length + ' 台设备'));
+        });
+        return;
+      }
+      var it = list[idx++];
+      db.addRecord({ databaseId: DB_DEV, properties: {
+        '设备名称': { text: it.name },
+        '所属部门': { text: it.dept || '' },
+        '车间': { text: it.area || '' },
+        '常用故障部位': { text: it.part || '' },
+        '排序': { number: base + idx },
         '状态': { select: '启用' }
-      } }));
-    }
-    toast('正在保存 ' + jobs.length + ' 台设备…');
-    Promise.all(jobs).then(function(){
-      loadDevices(function(){
-        renderDevManage(); renderDevPick();
-        toast(okText || ('已添加 ' + list.length + ' 台设备'));
+      } }).then(stepAdd, function(err){
+        console.error('[database] 设备批量保存失败:', err);
+        toast('部分设备保存失败，请刷新后检查');
+        stepAdd();
       });
-    }).catch(function(err){
-      console.error('[database] 设备批量保存失败:', err);
-      loadDevices(function(){ renderDevManage(); });
-      toast('部分设备保存失败，请刷新后检查');
-    });
+    }
+    stepAdd();
   }
   function devBulkSave(){
     var txt = $('devBulkText') ? $('devBulkText').value : '';
+    /* 批量录入的归属：取管理页「归属 / 查看」选中的部门 / 车间 */
+    var mg = $('devManageScope') ? devParseScope($('devManageScope').value) : { dept: '', sub: '' };
     var lines = String(txt).split('\n');
     var todo = [];
     for(var i=0;i<lines.length;i++){
@@ -2453,11 +2599,15 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       var cols = ln.split(/[|｜,，\t]+/);
       var nm = devTrim(cols[0]);
       if(!nm) continue;
-      if(devFind(nm)) continue;
+      if(devFind(nm, mg.dept)) continue;
       var dupInList = false;
       for(var j=0;j<todo.length;j++){ if(todo[j].name === nm){ dupInList = true; break; } }
       if(dupInList) continue;
-      todo.push({ name: nm, area: devTrim(cols[1]), part: devTrim(cols[2]) });
+      /* 已选到具体车间时，第二列直接当「常用故障部位」，不用再重复写车间 */
+      var area, part;
+      if(mg.sub && cols.length <= 2){ area = mg.sub; part = devTrim(cols[1] || ''); }
+      else { area = devTrim(cols[1]) || mg.sub; part = devTrim(cols[2]); }
+      todo.push({ name: nm, dept: mg.dept, area: area, part: part });
     }
     if(!todo.length){ toast('没有新设备（可能都已在清单里）'); return; }
     if($('devBulkText')) $('devBulkText').value = '';
@@ -2471,8 +2621,9 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       var nm = devTrim(r['设备名称']);
       if(!nm || seen[nm]) continue;
       seen[nm] = 1;
-      if(devFind(nm)) continue;
-      todo.push({ name: nm, area: devTrim(r['车间']), part: devTrim(r['故障部位']) });
+      var dp = devTrim(r['部门']);
+      if(devFind(nm, dp)) continue;
+      todo.push({ name: nm, dept: dp, area: devTrim(r['车间']), part: devTrim(r['故障部位']) });
     }
     if(!todo.length){ toast('历史工单里的设备都已在清单里'); return; }
     devAddMany(todo, '已从工单导入 ' + todo.length + ' 台');
@@ -2494,32 +2645,44 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
     });
   }
   function openDevManage(){
+    var sel = $('devManageScope');
+    var keep = sel ? sel.value : '';
+    devScopeOptions(sel, true, '全部部门');
+    if(keep && sel) sel.value = keep;
     renderDevManage();
     if($('devBulkBox')) $('devBulkBox').style.display = 'none';
     $('devManageModal').className = 'modal show';
   }
-  /* 报修提交后：把新出现的设备自动收进清单，下次直接选 */
-  function devAutoCollect(list){
+  /* 报修提交后：把新出现的设备自动收进清单，并按本次报修的部门 / 车间归档，下次直接选 */
+  function devAutoCollect(list, dept, sub){
     if(!db || !list || !list.length) return;
     var todo = [], seen = {};
     for(var i=0;i<list.length;i++){
       var nm = devTrim(list[i].device);
-      if(!nm || seen[nm] || devFind(nm)) continue;
-      seen[nm] = 1;
-      todo.push({ name: nm, area: '', part: devTrim(list[i].part) });
+      var key = (dept || '') + '|' + nm;
+      if(!nm || seen[key] || devFind(nm, dept || '')) continue;
+      seen[key] = 1;
+      todo.push({ name: nm, dept: dept || '', area: sub || '', part: devTrim(list[i].part) });
     }
     if(!todo.length) return;
-    var base = devMaxSort(), jobs = [];
-    for(var k=0;k<todo.length;k++){
-      jobs.push(db.addRecord({ databaseId: DB_DEV, properties: {
-        '设备名称': { text: todo[k].name },
-        '常用故障部位': { text: todo[k].part },
-        '排序': { number: base + 1 + k },
+    /* 同样串行写，避免一次报修多个新设备时并发覆盖 */
+    var base = devMaxSort(), k = 0;
+    function stepCollect(){
+      if(k >= todo.length){ loadDevices(); return; }
+      var it = todo[k++];
+      db.addRecord({ databaseId: DB_DEV, properties: {
+        '设备名称': { text: it.name },
+        '所属部门': { text: it.dept },
+        '车间': { text: it.area },
+        '常用故障部位': { text: it.part },
+        '排序': { number: base + k },
         '状态': { select: '启用' }
-      } }));
+      } }).then(stepCollect, function(err){
+        console.error('[database] 设备自动收录失败:', err);
+        stepCollect();
+      });
     }
-    Promise.all(jobs).then(function(){ loadDevices(); })
-      .catch(function(err){ console.error('[database] 设备自动收录失败:', err); });
+    stepCollect();
   }
 
   /* 旧逻辑/缓存读写依赖这几个隐藏锚点，同步第一个问题 */
@@ -2770,7 +2933,7 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
       if(nos.length){
         $('importText').value = '';
         $('importModal').className = 'modal';
-        devAutoCollect(okItems);
+        devAutoCollect(okItems, dept, sub);
         loadAll();
         msg = '已导入 ' + nos.length + ' 单：' + nos[0] + (nos.length > 1 ? ' 等' : '');
       } else {
@@ -2967,8 +3130,8 @@ td.td-today{box-shadow:inset 0 0 0 2px var(--pri)}
         }
         if(pushed.length) pushNewOrders(pushed);
       }
-      /* 这次填的设备如果清单里还没有，自动收进设备台账，下次所有人直接选 */
-      if(nos.length) devAutoCollect(okItems);
+      /* 这次填的设备如果清单里还没有，自动收进设备台账并归到本次部门 / 车间，下次所有人直接选 */
+      if(nos.length) devAutoCollect(okItems, dept, sub);
       /* 报完一张单立刻给出这张新单的 AI 诊断。用刚提交的字段做快照，
          不用等云存储同步完，维修人员点开就能看原因推断和排查建议。
          一次报多张时不弹窗打断，每张单上都有「AI 诊断」按钮可点开。 */
@@ -7779,20 +7942,26 @@ function xBuildXlsx(t){
         if(state.selDept === pd && state.selSub === sd){ state.selDept=''; state.selSub=''; }
         else { state.selDept = pd; state.selSub = sd; }
         $('fDept').value = state.selDept ? (state.selSub ? state.selDept+' / '+state.selSub : state.selDept) : '';
-        renderDepts(); syncSubSelect(); cacheForm();
+        renderDepts(); syncSubSelect(); cacheForm(); renderDevPickIfOpen();
         return;
       }
       var c = e.target.closest('.dept');
       if(!c) return;
       var name = c.getAttribute('data-dept');
-      if(state.selDept === name && !state.selSub){ state.selDept=''; state.selSub=''; }
-      else { state.selDept = name; state.selSub=''; }
+      if(state.selDept === name && !state.selSub){
+        state.selDept=''; state.selSub='';
+        if(state.openDept === name) state.openDept = '';
+      }
+      else {
+        state.selDept = name; state.selSub='';
+        if(childrenOf(name).length) state.openDept = name;   /* 有车间就自动展开，方便接着点车间 */
+      }
       $('fDept').value = state.selDept || '';
-      renderDepts(); syncSubSelect(); cacheForm();
+      renderDepts(); syncSubSelect(); cacheForm(); renderDevPickIfOpen();
     });
-    $('fDept').addEventListener('change', function(){ syncSubSelect(); cacheForm(); });
+    $('fDept').addEventListener('change', function(){ syncSubSelect(); cacheForm(); renderDevPickIfOpen(); });
     var fs = $('fSub');
-    if(fs){ fs.addEventListener('change', function(){ state.selSub = this.value; cacheForm(); }); }
+    if(fs){ fs.addEventListener('change', function(){ state.selSub = this.value; cacheForm(); renderDevPickIfOpen(); }); }
     $('repairForm').addEventListener('submit', onSubmit);
     $('fAutoBtn').addEventListener('click', faOpen);
     $('faList').addEventListener('click', function(e){
@@ -7831,6 +8000,12 @@ function xBuildXlsx(t){
       openDevPick(inp);
     });
     $('devSearch').addEventListener('input', renderDevPick);
+    $('devScopeBar').addEventListener('click', function(e){
+      var b = e.target.closest('[data-devall]');
+      if(!b) return;
+      devShowAll = !devShowAll;
+      renderDevPick();
+    });
     $('devList').addEventListener('click', function(e){
       var it = e.target.closest('[data-devid]');
       if(!it) return;
@@ -7839,13 +8014,21 @@ function xBuildXlsx(t){
         if(devList[i].id === id){ devFill(devList[i]); return; }
       }
     });
-    $('devAddBtn').addEventListener('click', function(){ openDevEdit(null); });
+    $('devAddBtn').addEventListener('click', function(){ openDevEdit(null, devScope()); });
     $('devBackBtn').addEventListener('click', devModalBack);
     $('devSaveBtn').addEventListener('click', devSave);
     $('devPickCancel').addEventListener('click', closeDevPick);
     $('devManageBtn').addEventListener('click', function(){ closeDevPick(); openDevManage(); });
     $('devManageBtn2').addEventListener('click', openDevManage);
     $('devManageClose').addEventListener('click', function(){ $('devManageModal').className = 'modal'; });
+    $('devManageScope').addEventListener('change', renderDevManage);
+    $('devManageAdd').addEventListener('click', function(){
+      var sc = devParseScope($('devManageScope').value);
+      $('devManageModal').className = 'modal';
+      if($('devSearch')) $('devSearch').value = '';
+      devPickInput = null;   /* 从管理页新增，不回填报修输入框 */
+      openDevEdit(null, sc);
+    });
     $('devManageList').addEventListener('click', function(e){
       var b = e.target.closest('[data-devdel]');
       if(!b) return;

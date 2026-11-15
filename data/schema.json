@@ -743,6 +743,11 @@
         "type": "text"
       },
       {
+        "id": "devdept001",
+        "name": "所属部门",
+        "type": "text"
+      },
+      {
         "id": "0dbade76",
         "name": "车间",
         "type": "text"
